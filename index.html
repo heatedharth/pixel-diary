@@ -21,10 +21,18 @@
         <!-- TODO: Replace text with logo image when designed -->
         <span>🎮 Pixel Diary</span>
       </div>
-      <ul class="nav-links">
-        <li><a href="pages/library.html">My Library</a></li>
+
+      <!-- Logged OUT: show Log In + Sign Up -->
+      <ul class="nav-links" id="nav-logged-out">
         <li><a href="pages/login.html">Log In</a></li>
         <li><a href="pages/signup.html">Sign Up</a></li>
+      </ul>
+
+      <!-- Logged IN: show My Library, Profile, Log Out -->
+      <ul class="nav-links" id="nav-logged-in" style="display:none;">
+        <li><a href="pages/library.html">My Library</a></li>
+        <li><a href="pages/profile.html">Profile</a></li>
+        <li><a href="#" id="logout-btn">Log Out</a></li>
       </ul>
     </nav>
   </header>
@@ -46,7 +54,8 @@
       </div>
       <div class="hero-image">
         <!-- TODO: Add hero illustration/mascot image here -->
-        <!-- <img src="" alt="Pixel Diary" /> -->
+        <!-- TODO: Replace emoji with mascot illustration when designed -->
+        🎮
       </div>
     </section>
 
@@ -113,10 +122,15 @@
     <p>&copy; 2025 Pixel Diary. Made with 💖 for gamers.</p>
   </footer>
 
-  <!-- TODO: Link scripts when built -->
-  <!-- <script src="assets/js/app.js"></script> -->
-  <!-- <script src="assets/js/router.js"></script> -->
-  <!-- <script src="assets/js/auth.js"></script> -->
+  <!-- Firebase SDK -->
+  <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-auth-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
+  <!-- App scripts -->
+  <script src="firebase.config.js"></script>
+  <script src="assets/js/db.js"></script>
+  <script src="assets/js/auth.js"></script>
+  <script src="assets/js/app.js"></script>
 
 </body>
 

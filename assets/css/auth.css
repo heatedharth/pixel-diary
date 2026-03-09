@@ -1,0 +1,187 @@
+/* ============================================================
+   auth.css — Login & Sign Up Page Styles
+   Pixel Diary | Kawaii pink/purple theme
+   ============================================================ */
+
+/* ── Page Layout ── */
+.auth-page {
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 2rem;
+}
+
+/* ── Card ── */
+.auth-card {
+  background: white;
+  border: 1.5px solid var(--purple-light);
+  border-radius: 28px;
+  padding: 3rem 2.5rem;
+  width: 100%;
+  max-width: 460px;
+  box-shadow: 0 8px 40px rgba(199,168,240,0.18);
+  position: relative;
+  z-index: 1;
+}
+
+/* ── Header ── */
+.auth-header {
+  text-align: center;
+  margin-bottom: 2rem;
+}
+
+.auth-header .auth-icon {
+  font-size: 2.8rem;
+  display: block;
+  margin-bottom: 0.5rem;
+}
+
+.auth-header h1 {
+  font-family: var(--font-display);
+  font-size: 2.2rem;
+  background: linear-gradient(135deg, var(--pink-deep), var(--purple-deep));
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  margin-bottom: 0.3rem;
+}
+
+.auth-header p {
+  font-size: 1.2rem;
+  color: var(--text-soft);
+}
+
+/* ── Form Fields ── */
+.auth-form {
+  display: flex;
+  flex-direction: column;
+  gap: 1.2rem;
+}
+
+.form-group {
+  display: flex;
+  flex-direction: column;
+  gap: 0.4rem;
+}
+
+.form-group label {
+  font-size: 1.15rem;
+  color: var(--text-mid);
+  font-family: var(--font-body);
+}
+
+.form-group input {
+  font-family: var(--font-body);
+  font-size: 1.15rem;
+  padding: 0.75rem 1rem;
+  border: 1.5px solid var(--purple-light);
+  border-radius: 14px;
+  background: var(--surface);
+  color: var(--text-dark);
+  outline: none;
+  transition: border-color 0.2s, box-shadow 0.2s;
+}
+
+.form-group input:focus {
+  border-color: var(--purple);
+  box-shadow: 0 0 0 3px rgba(199,168,240,0.25);
+}
+
+.form-group input::placeholder {
+  color: var(--text-soft);
+}
+
+/* ── Forgot Password Link ── */
+.forgot-link {
+  text-align: right;
+  margin-top: -0.6rem;
+}
+
+.forgot-link a {
+  font-size: 1rem;
+  color: var(--text-soft);
+  text-decoration: none;
+  transition: color 0.2s;
+}
+
+.forgot-link a:hover { color: var(--pink-deep); }
+
+/* ── Submit Button ── */
+.auth-btn {
+  font-family: var(--font-display);
+  font-size: 1.3rem;
+  padding: 0.85rem;
+  border: none;
+  border-radius: var(--radius-pill);
+  background: linear-gradient(135deg, var(--pink), var(--purple));
+  color: white;
+  cursor: pointer;
+  box-shadow: var(--shadow-pink);
+  transition: transform 0.18s, opacity 0.18s;
+  margin-top: 0.5rem;
+}
+
+.auth-btn:hover {
+  transform: translateY(-2px);
+  opacity: 0.92;
+}
+
+/* ── Divider ── */
+.auth-divider {
+  text-align: center;
+  font-size: 1rem;
+  color: var(--text-soft);
+  margin: 0.5rem 0;
+  position: relative;
+}
+
+.auth-divider::before,
+.auth-divider::after {
+  content: '';
+  position: absolute;
+  top: 50%;
+  width: 38%;
+  height: 1px;
+  background: var(--purple-light);
+}
+.auth-divider::before { left: 0; }
+.auth-divider::after  { right: 0; }
+
+/* ── Switch Page Link ── */
+.auth-switch {
+  text-align: center;
+  font-size: 1.15rem;
+  color: var(--text-mid);
+}
+
+.auth-switch a {
+  color: var(--purple-deep);
+  font-family: var(--font-display);
+  font-size: 1.15rem;
+  text-decoration: none;
+  transition: color 0.2s;
+}
+
+.auth-switch a:hover { color: var(--pink-deep); }
+
+/* ── Error / Success Messages ── */
+.auth-message {
+  font-size: 1.1rem;
+  padding: 0.7rem 1rem;
+  border-radius: 12px;
+  text-align: center;
+  display: none;
+}
+
+.auth-message.error {
+  background: #ffe0e6;
+  color: #c0405a;
+  display: block;
+}
+
+.auth-message.success {
+  background: #e0f7e9;
+  color: #2e7d52;
+  display: block;
+}

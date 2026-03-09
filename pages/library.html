@@ -1,0 +1,153 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>My Library — Pixel Diary</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link href="https://fonts.googleapis.com/css2?family=Jersey+10&family=Just+Me+Again+Down+Here&display=swap"
+        rel="stylesheet" />
+    <link rel="stylesheet" href="../assets/css/main.css" />
+    <link rel="stylesheet" href="../assets/css/library.css" />
+</head>
+
+<body class="library-page">
+
+    <!-- ==================== NAVBAR ==================== -->
+    <header>
+        <nav>
+            <div class="nav-logo">
+                <a href="../index.html" style="text-decoration:none;">
+                    <span>🎮 Pixel Diary</span>
+                </a>
+            </div>
+            <ul class="nav-links" id="nav-logged-out">
+                <li><a href="login.html">Log In</a></li>
+                <li><a href="signup.html">Sign Up</a></li>
+            </ul>
+            <ul class="nav-links" id="nav-logged-in" style="display:none;">
+                <li><a href="library.html">My Library</a></li>
+                <li><a href="profile.html">Profile</a></li>
+                <li><a href="#" id="logout-btn">Log Out</a></li>
+            </ul>
+        </nav>
+    </header>
+
+    <!-- ==================== LIBRARY HEADER ==================== -->
+    <div class="library-header">
+        <h1>My Library</h1>
+        <button class="add-game-btn" id="add-game-btn">+ Add Game</button>
+    </div>
+
+    <!-- ==================== GAME GRID ==================== -->
+    <div class="game-grid-container">
+
+        <!-- Loading spinner -->
+        <div id="spinner">
+            <div class="spinner-ring"></div>
+        </div>
+
+        <!-- Empty state -->
+        <div id="empty-state" style="display:none;">
+            <span class="empty-icon">🎮</span>
+            <p>No games yet! Add your first game to get started.</p>
+        </div>
+
+        <!-- Game cards render here -->
+        <div id="game-grid"></div>
+
+    </div>
+
+    <!-- ==================== ADD / EDIT MODAL ==================== -->
+    <div class="modal-backdrop" id="game-modal">
+        <div class="modal-card">
+
+            <div class="modal-header">
+                <h2 id="modal-title">Add Game</h2>
+                <button class="modal-close" id="modal-close-btn">✕</button>
+            </div>
+
+            <form class="modal-form" id="game-form">
+
+                <!-- Title -->
+                <div class="form-group">
+                    <label for="field-title">Game Title *</label>
+                    <input type="text" id="field-title" placeholder="e.g. Hollow Knight" required />
+                </div>
+
+                <!-- Genre + Platform -->
+                <div class="modal-form-row">
+                    <div class="form-group">
+                        <label for="field-genre">Genre</label>
+                        <input type="text" id="field-genre" placeholder="e.g. RPG" />
+                    </div>
+                    <div class="form-group">
+                        <label for="field-platform">Platform</label>
+                        <input type="text" id="field-platform" placeholder="e.g. PC, Switch" />
+                    </div>
+                </div>
+
+                <!-- Status + Hours -->
+                <div class="modal-form-row">
+                    <div class="form-group">
+                        <label for="field-status">Status</label>
+                        <select id="field-status">
+                            <option value="plan-to-play">Plan to Play</option>
+                            <option value="playing">Playing</option>
+                            <option value="played">Played</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label for="field-hours">Hours Played</label>
+                        <input type="number" id="field-hours" placeholder="0" min="0" step="0.5" />
+                    </div>
+                </div>
+
+                <!-- Cover Image URL -->
+                <div class="form-group">
+                    <label for="field-cover">Cover Image URL</label>
+                    <input type="url" id="field-cover" placeholder="https://..." />
+                </div>
+
+                <div class="modal-actions">
+                    <button type="submit" class="modal-btn-primary" id="modal-save-btn">Save Game</button>
+                    <button type="button" class="modal-btn-secondary" id="modal-cancel-btn">Cancel</button>
+                </div>
+
+            </form>
+        </div>
+    </div>
+
+    <!-- ==================== DELETE CONFIRM MODAL ==================== -->
+    <div class="modal-backdrop" id="delete-modal">
+        <div class="modal-card delete-modal-card">
+            <span class="delete-icon">🗑️</span>
+            <h2>Delete Game?</h2>
+            <p>Are you sure you want to delete <span id="delete-game-title"></span>? This can't be undone.</p>
+            <div class="modal-actions">
+                <button class="modal-btn-danger" id="confirm-delete-btn">Yes, Delete</button>
+                <button class="modal-btn-secondary" id="cancel-delete-btn">Cancel</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- ==================== TOAST ==================== -->
+    <div class="toast" id="toast"></div>
+
+    <!-- ==================== SCRIPTS ==================== -->
+    <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-auth-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
+    <script src="../firebase.config.js"></script>
+    <script src="../assets/js/db.js"></script>
+    <script src="../assets/js/auth.js"></script>
+    <script src="../assets/js/app.js"></script>
+    <script src="../assets/js/games.js"></script>
+    <script src="../assets/js/ui.js"></script>
+    <script src="../assets/js/library.js"></script>
+
+</body>
+
+</html>
