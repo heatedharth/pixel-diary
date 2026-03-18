@@ -1,0 +1,144 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>My Profile — Pixel Diary</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Jersey+10&family=Just+Me+Again+Down+Here&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="../assets/css/main.css" />
+  <link rel="stylesheet" href="../assets/css/library.css" />
+  <link rel="stylesheet" href="../assets/css/profile.css" />
+</head>
+<body class="profile-page">
+
+  <!-- ==================== NAVBAR ==================== -->
+  <header>
+    <nav>
+      <div class="nav-logo">
+        <a href="../index.html" style="text-decoration:none;">
+          <span>🎮 Pixel Diary</span>
+        </a>
+      </div>
+      <ul class="nav-links" id="nav-logged-out">
+        <li><a href="login.html">Log In</a></li>
+        <li><a href="signup.html">Sign Up</a></li>
+      </ul>
+      <ul class="nav-links" id="nav-logged-in" style="display:none;">
+        <li><a href="library.html">My Library</a></li>
+        <li><a href="profile.html">Profile</a></li>
+        <li><a href="#" id="logout-btn">Log Out</a></li>
+      </ul>
+    </nav>
+  </header>
+
+  <!-- ==================== BANNER ==================== -->
+  <div class="profile-banner" id="profile-banner">
+    <label class="banner-upload-btn" title="Change banner">
+      📷
+      <input type="file" id="banner-upload-input" accept="image/*" hidden />
+    </label>
+  </div>
+
+  <!-- ==================== PROFILE HEADER ==================== -->
+  <div class="profile-header-wrap">
+
+    <!-- Avatar -->
+    <div class="profile-avatar-wrap">
+      <div class="profile-avatar" id="profile-avatar">
+        <span class="avatar-initials">?</span>
+      </div>
+      <label class="avatar-upload-btn" title="Change avatar">
+        ✏️
+        <input type="file" id="avatar-upload-input" accept="image/*" hidden />
+      </label>
+    </div>
+
+    <!-- Name + bio + actions -->
+    <div class="profile-identity">
+      <h1 class="profile-username" id="profile-username">Loading...</h1>
+      <p class="profile-email" id="profile-email"></p>
+      <p class="profile-bio" id="profile-bio"></p>
+
+      <div class="profile-actions">
+        <button class="profile-edit-btn" id="edit-profile-btn">✏️ Edit Profile</button>
+        <button class="profile-logout-btn" onclick="logOut()">Log Out</button>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- ==================== EDIT PROFILE FORM ==================== -->
+  <div class="profile-edit-form" id="edit-profile-form" style="display:none;">
+    <div class="profile-section">
+      <h2 class="profile-section-title">Edit Profile</h2>
+
+      <div class="form-group">
+        <label for="edit-username">Username</label>
+        <input type="text" id="edit-username" placeholder="Your username" />
+      </div>
+
+      <div class="form-group">
+        <label for="edit-bio">Bio</label>
+        <textarea id="edit-bio" class="profile-bio-input" placeholder="Tell the world about yourself..."></textarea>
+      </div>
+
+      <div class="profile-form-actions">
+        <button class="modal-btn-primary" id="edit-profile-save">Save Changes</button>
+        <button class="modal-btn-secondary" id="edit-cancel-btn">Cancel</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ==================== STATS ==================== -->
+  <div class="profile-section">
+    <h2 class="profile-section-title">📊 My Stats</h2>
+    <div class="profile-stats">
+      <div class="pstat-card">
+        <span class="pstat-number" id="pstat-total">0</span>
+        <span class="pstat-label">Total Games</span>
+      </div>
+      <div class="pstat-card">
+        <span class="pstat-number pstat-played" id="pstat-played">0</span>
+        <span class="pstat-label">Played</span>
+      </div>
+      <div class="pstat-card">
+        <span class="pstat-number pstat-playing" id="pstat-playing">0</span>
+        <span class="pstat-label">Playing</span>
+      </div>
+      <div class="pstat-card">
+        <span class="pstat-number pstat-plan" id="pstat-plan">0</span>
+        <span class="pstat-label">Plan to Play</span>
+      </div>
+      <div class="pstat-card">
+        <span class="pstat-number pstat-fav" id="pstat-favorites">0</span>
+        <span class="pstat-label">Favourites</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- ==================== FAVORITES ==================== -->
+  <div class="profile-section">
+    <h2 class="profile-section-title">♥ Favourite Games</h2>
+    <p id="favorites-empty" style="display:none;" class="profile-empty-msg">
+      No favourites yet — heart some games in your library!
+    </p>
+    <div class="favorites-grid" id="favorites-grid"></div>
+  </div>
+
+  <!-- ==================== TOAST ==================== -->
+  <div class="toast" id="toast"></div>
+
+  <!-- ==================== SCRIPTS ==================== -->
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="../supabase.config.js"></script>
+  <script src="../assets/js/db.js"></script>
+  <script src="../assets/js/auth.js"></script>
+  <script src="../assets/js/app.js"></script>
+  <script src="../assets/js/games.js"></script>
+  <script src="../assets/js/profile.js"></script>
+  <script src="../assets/js/profile-page.js"></script>
+
+</body>
+</html>
