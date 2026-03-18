@@ -1,11 +1,14 @@
-# Firebase config (contains sensitive API keys)
+# Supabase config (contains sensitive API keys)
+supabase.config.js
+
+# Firebase config (no longer used — kept here in case file still exists locally)
 firebase.config.js
 
 # OS files
 .DS_Store
 Thumbs.db
 
-# Uploaded media (large files, stored in Firebase Storage)
+# Uploaded media (stored in Supabase Storage)
 assets/images/uploads/
 
 # Node (if any build tools are added later)

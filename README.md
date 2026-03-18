@@ -130,6 +130,10 @@ The development approach is **a couple core features per day**, fully working be
 | **Day 4** | Media Uploads + Image/clip upload to Firebase Storage, gallery display + User Profile + Profile page, avatar, bio, banner, stats |
 | **Day 5** | UI Polish + Kawaii styling, responsive layout, transitions + Testing + Bug Fixes + Cross-browser checks, edge case handling, final cleanup |
 
+### NOTES
+
+All FireBase mentions are replaced with Supabase.
+
 ---
 
 *Built with 💖 for gamers, by a gamer.*
