@@ -7,13 +7,11 @@
 // ── Sign Up ──────────────────────────────────────────────────
 async function signUp(username, email, password) {
   try {
-    // 1. Create Supabase Auth user
     const { data, error } = await supabaseClient.auth.signUp({ email, password });
     if (error) return error.message;
 
     const user = data.user;
 
-    // 2. Create a profile row in the profiles table
     const { error: profileError } = await supabaseClient
       .from("profiles")
       .insert({
@@ -27,7 +25,6 @@ async function signUp(username, email, password) {
 
     if (profileError) return profileError.message;
 
-    // 3. Redirect to library
     window.location.href = "library.html";
 
   } catch (err) {
@@ -53,9 +50,13 @@ async function logOut() {
   } catch (err) {
     console.error("Logout error:", err.message);
   } finally {
-    // Always redirect regardless of whether signOut succeeded
-    const isInSubfolder = window.location.pathname.includes("/pages/");
-    window.location.href = isInSubfolder ? "../index.html" : "index.html";
+    // Robustly find the root path regardless of deployment subfolder
+    const parts = window.location.pathname.split("/");
+    const pageIdx = parts.lastIndexOf("pages");
+    const base = pageIdx > 0
+      ? parts.slice(0, pageIdx).join("/")
+      : parts.slice(0, -1).join("/");
+    window.location.replace(base + "/index.html");
   }
 }
 
@@ -64,7 +65,7 @@ async function resetPassword(email) {
   try {
     const { error } = await supabaseClient.auth.resetPasswordForEmail(email);
     if (error) return error.message;
-    return null; // null = success
+    return null;
   } catch (err) {
     return err.message;
   }

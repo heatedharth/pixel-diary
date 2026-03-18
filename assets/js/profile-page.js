@@ -1,6 +1,5 @@
 // ============================================================
 // profile-page.js — Profile Page Logic
-// Loads profile, renders all sections, handles edits/uploads.
 // Depends on: supabase.config.js, db.js, auth.js, app.js,
 //             profile.js, games.js
 // ============================================================
@@ -11,6 +10,21 @@ requireAuth("login.html");
 // ── State ─────────────────────────────────────────────────────
 let currentProfile = null;
 
+// ── Get user safely (waits for session if not cached yet) ────
+async function getAuthUser() {
+  let user = getCurrentUser();
+  if (user) return user;
+
+  // getCurrentUser() can be null if onAuthStateChange hasn't
+  // fired yet — get the session directly as a fallback
+  const { data: { session } } = await supabaseClient.auth.getSession();
+  if (session?.user) {
+    _setCurrentUser(session.user);
+    return getCurrentUser();
+  }
+  return null;
+}
+
 // ── Initial load ──────────────────────────────────────────────
 supabaseClient.auth.onAuthStateChange(async (event, session) => {
   if (!session?.user) return;
@@ -20,7 +34,7 @@ supabaseClient.auth.onAuthStateChange(async (event, session) => {
 
 // ── Load everything ───────────────────────────────────────────
 async function loadProfile() {
-  const user = getCurrentUser();
+  const user = await getAuthUser();
   if (!user) return;
 
   currentProfile = await getProfile(user.uid);
@@ -80,7 +94,6 @@ function renderStats(stats) {
 function renderFavorites(games) {
   const grid = document.getElementById("favorites-grid");
   const empty = document.getElementById("favorites-empty");
-
   grid.innerHTML = "";
 
   if (games.length === 0) {
@@ -98,14 +111,17 @@ function renderFavorites(games) {
       "played": "badge-played", "playing": "badge-playing", "plan-to-play": "badge-plan"
     }[game.status] || "badge-plan";
 
+    const statusLabel = {
+      "played": "Played", "playing": "Playing", "plan-to-play": "Plan to Play"
+    }[game.status] || "";
+
     card.innerHTML = `
       ${game.coverURL
         ? `<img src="${game.coverURL}" class="fav-cover" alt="${game.title}" />`
         : `<div class="fav-cover-placeholder">🎮</div>`}
       <div class="fav-info">
         <p class="fav-title">${game.title}</p>
-        <span class="card-badge ${statusClass} fav-badge">${{ "played": "Played", "playing": "Playing", "plan-to-play": "Plan to Play" }[game.status] || ""
-      }</span>
+        <span class="card-badge ${statusClass} fav-badge">${statusLabel}</span>
       </div>
     `;
 
@@ -122,7 +138,6 @@ const editForm = document.getElementById("edit-profile-form");
 const cancelBtn = document.getElementById("edit-cancel-btn");
 
 editBtn.addEventListener("click", () => {
-  // Pre-fill form with current values
   document.getElementById("edit-username").value = currentProfile?.username || "";
   document.getElementById("edit-bio").value = currentProfile?.bio || "";
   editForm.style.display = "block";
@@ -134,9 +149,14 @@ cancelBtn.addEventListener("click", () => {
   editBtn.style.display = "inline-flex";
 });
 
-// ── Save Profile Text Fields ──────────────────────────────────
+// ── Save Profile ──────────────────────────────────────────────
 document.getElementById("edit-profile-save").addEventListener("click", async () => {
-  const user = getCurrentUser();
+  const user = await getAuthUser();
+  if (!user) {
+    showProfileToast("Session expired. Please log in again.", "error");
+    return;
+  }
+
   const username = document.getElementById("edit-username").value.trim();
   const bio = document.getElementById("edit-bio").value.trim();
 
@@ -161,9 +181,13 @@ document.getElementById("avatar-upload-input").addEventListener("change", async 
   const file = e.target.files[0];
   if (!file) return;
 
-  const user = getCurrentUser();
-  showProfileToast("Uploading avatar...", "info");
+  const user = await getAuthUser();
+  if (!user) {
+    showProfileToast("Session expired. Please log in again.", "error");
+    return;
+  }
 
+  showProfileToast("Uploading avatar...", "info");
   const result = await uploadAvatar(user.uid, file);
   if (result.error) {
     showProfileToast("Error uploading avatar: " + result.error, "error");
@@ -179,9 +203,13 @@ document.getElementById("banner-upload-input").addEventListener("change", async 
   const file = e.target.files[0];
   if (!file) return;
 
-  const user = getCurrentUser();
-  showProfileToast("Uploading banner...", "info");
+  const user = await getAuthUser();
+  if (!user) {
+    showProfileToast("Session expired. Please log in again.", "error");
+    return;
+  }
 
+  showProfileToast("Uploading banner...", "info");
   const result = await uploadBanner(user.uid, file);
   if (result.error) {
     showProfileToast("Error uploading banner: " + result.error, "error");
