@@ -4,9 +4,6 @@
 //             profile.js, games.js
 // ============================================================
 
-// ── Protect page ─────────────────────────────────────────────
-requireAuth("login.html");
-
 // ── State ─────────────────────────────────────────────────────
 let currentProfile = null;
 
@@ -26,15 +23,20 @@ async function getAuthUser() {
 }
 
 // ── Initial load ──────────────────────────────────────────────
-let profileLoaded = false;
-supabaseClient.auth.onAuthStateChange(async (event, session) => {
-  if (!session?.user) return;
-  _setCurrentUser(session.user);
-  if (!profileLoaded) {
-    profileLoaded = true;
-    await loadProfile();
+async function initPage() {
+  const { data: { session } } = await supabaseClient.auth.getSession();
+
+  if (!session?.user) {
+    window.location.href = "login.html";
+    return;
   }
-});
+
+  _setCurrentUser(session.user);
+  updateNavbar(session.user);
+  await loadProfile();
+}
+
+initPage();
 
 // ── Load everything ───────────────────────────────────────────
 async function loadProfile() {

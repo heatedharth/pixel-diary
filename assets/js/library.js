@@ -5,9 +5,6 @@
 // Depends on: db.js, auth.js, games.js, ui.js, search-filter.js
 // ============================================================
 
-// ── Protect page — redirect if not logged in ─────────────────
-requireAuth("../pages/login.html");
-
 // ── Get user safely (fallback if cache not yet populated) ────
 async function getAuthUser() {
     let user = getCurrentUser();
@@ -244,27 +241,28 @@ document.getElementById("delete-modal").addEventListener("click", (e) => {
 });
 
 // ── Initial load ─────────────────────────────────────────────
-// Only load on INITIAL_SESSION and SIGNED_IN to avoid
-// multiple simultaneous loadLibrary() calls on token refresh
-let libraryLoaded = false;
-supabaseClient.auth.onAuthStateChange(async (event, session) => {
-    if (!session?.user) return;
+// Use getSession() directly instead of onAuthStateChange —
+// much more reliable for initial page load.
+async function initPage() {
+    const { data: { session } } = await supabaseClient.auth.getSession();
+
+    if (!session?.user) {
+        window.location.href = "../pages/login.html";
+        return;
+    }
+
     _setCurrentUser(session.user);
+    updateNavbar(session.user);
+    await loadLibrary();
 
-    if (event === "INITIAL_SESSION" || event === "SIGNED_IN") {
-        libraryLoaded = false;
+    // Auto-open edit modal if redirected from game-detail page
+    const params = new URLSearchParams(window.location.search);
+    const editId = params.get("edit");
+    if (editId) {
+        const game = allGames.find(g => g.id === editId);
+        if (game) openModal("edit", game);
+        window.history.replaceState({}, "", window.location.pathname);
     }
+}
 
-    if (!libraryLoaded) {
-        libraryLoaded = true;
-        await loadLibrary();
-
-        const params = new URLSearchParams(window.location.search);
-        const editId = params.get("edit");
-        if (editId) {
-            const game = allGames.find(g => g.id === editId);
-            if (game) openModal("edit", game);
-            window.history.replaceState({}, "", window.location.pathname);
-        }
-    }
-});
+initPage();

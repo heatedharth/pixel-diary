@@ -4,9 +4,6 @@
 // Depends on: db.js, auth.js, games.js, reviews.js, app.js
 // ============================================================
 
-// ── Protect page ─────────────────────────────────────────────
-requireAuth("login.html");
-
 // ── Read game ID from URL (?id=GAMEID) ───────────────────────
 const params = new URLSearchParams(window.location.search);
 const gameId = params.get("id");
@@ -422,12 +419,17 @@ document.addEventListener("keydown", (e) => {
 });
 
 // ── Initial load ──────────────────────────────────────────────
-let detailLoaded = false;
-supabaseClient.auth.onAuthStateChange((event, session) => {
-  if (!session?.user) return;
-  _setCurrentUser(session.user);
-  if (!detailLoaded) {
-    detailLoaded = true;
-    loadGame();
+async function initPage() {
+  const { data: { session } } = await supabaseClient.auth.getSession();
+
+  if (!session?.user) {
+    window.location.href = "login.html";
+    return;
   }
-});
+
+  _setCurrentUser(session.user);
+  updateNavbar(session.user);
+  await loadGame();
+}
+
+initPage();
