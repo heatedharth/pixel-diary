@@ -1,0 +1,112 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Game Detail — Pixel Diary</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Jersey+10&family=Just+Me+Again+Down+Here&display=swap"
+    rel="stylesheet" />
+  <link rel="stylesheet" href="../assets/css/main.css" />
+  <link rel="stylesheet" href="../assets/css/library.css" />
+  <link rel="stylesheet" href="../assets/css/game-detail.css" />
+</head>
+
+<body class="detail-page">
+
+  <!-- ==================== NAVBAR ==================== -->
+  <header>
+    <nav>
+      <div class="nav-logo">
+        <a href="../index.html" style="text-decoration:none;">
+          <span>🎮 Pixel Diary</span>
+        </a>
+      </div>
+      <ul class="nav-links" id="nav-logged-out">
+        <li><a href="login.html">Log In</a></li>
+        <li><a href="signup.html">Sign Up</a></li>
+      </ul>
+      <ul class="nav-links" id="nav-logged-in" style="display:none;">
+        <li><a href="library.html">My Library</a></li>
+        <li><a href="profile.html">Profile</a></li>
+        <li><a href="#" id="logout-btn">Log Out</a></li>
+      </ul>
+    </nav>
+  </header>
+
+  <!-- ==================== BACK LINK ==================== -->
+  <a href="library.html" class="back-link">← Back to Library</a>
+
+  <!-- ==================== DETAIL CONTAINER ==================== -->
+  <div class="detail-container">
+
+    <!-- ── Hero Row ── -->
+    <div class="detail-hero">
+      <div id="detail-cover"></div>
+      <div class="detail-info">
+        <h1 class="detail-title" id="detail-title"></h1>
+        <div class="detail-meta" id="detail-meta"></div>
+        <div class="detail-stars" id="detail-stars"></div>
+        <div class="detail-actions">
+          <button class="detail-btn detail-btn-primary" id="detail-edit-btn">Edit Game</button>
+          <button class="detail-btn detail-btn-fav" id="detail-fav-btn">♥</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- ── Review Section ── -->
+    <div class="detail-section">
+      <h2 class="detail-section-title">⭐ My Review</h2>
+      <div id="review-container"></div>
+    </div>
+
+    <!-- ── Media Section ── -->
+    <div class="detail-section">
+      <div class="detail-section-header">
+        <h2 class="detail-section-title">📸 Screenshots & Clips</h2>
+        <span class="media-count" id="media-count"></span>
+      </div>
+      <div class="media-upload-zone" id="media-upload-zone">
+        <input type="file" id="media-file-input" class="media-file-input"
+          accept="image/jpeg,image/png,image/gif,image/webp,video/mp4,video/webm" multiple />
+        <span class="media-upload-icon">📁</span>
+        <p class="media-upload-label">Click or drag files here</p>
+        <p class="media-upload-hint">JPG, PNG, GIF, WEBP, MP4, WEBM — max 50MB each</p>
+      </div>
+      <div class="media-progress-wrap" id="media-progress-wrap" style="display:none;">
+        <div class="media-progress-bar" id="media-progress-bar"></div>
+        <span class="media-progress-label" id="media-progress-label">Uploading...</span>
+      </div>
+      <div class="media-gallery" id="media-gallery"></div>
+    </div>
+
+  </div>
+
+  <!-- ==================== LIGHTBOX ==================== -->
+  <div class="media-lightbox" id="media-lightbox">
+    <button class="lightbox-close" id="lightbox-close">✕</button>
+    <button class="lightbox-nav lightbox-prev" id="lightbox-prev">‹</button>
+    <div class="lightbox-media" id="lightbox-media"></div>
+    <button class="lightbox-nav lightbox-next" id="lightbox-next">›</button>
+    <span class="lightbox-counter" id="lightbox-counter"></span>
+  </div>
+
+  <!-- ==================== TOAST ==================== -->
+  <div class="toast" id="toast"></div>
+
+  <!-- ==================== SCRIPTS ==================== -->
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="../supabase.config.js"></script>
+  <script src="../assets/js/db.js"></script>
+  <script src="../assets/js/auth.js"></script>
+  <script src="../assets/js/app.js"></script>
+  <script src="../assets/js/games.js"></script>
+  <script src="../assets/js/reviews.js"></script>
+  <script src="../assets/js/media.js"></script>
+  <script src="../assets/js/game-detail.js"></script>
+
+</body>
+
+</html>

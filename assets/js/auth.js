@@ -1,69 +1,68 @@
 // ============================================================
-// auth.js — Authentication Logic
+// auth.js — Authentication (Supabase Auth)
 // Handles sign up, log in, log out, and password reset.
-// Depends on: db.js (auth, db, userDoc)
+// Depends on: supabase.config.js (supabaseClient), db.js
 // ============================================================
 
-// ── Sign Up ─────────────────────────────────────────────────
+// ── Sign Up ──────────────────────────────────────────────────
 async function signUp(username, email, password) {
   try {
-    // 1. Create the Firebase Auth user
-    const userCredential = await auth.createUserWithEmailAndPassword(email, password);
-    const user = userCredential.user;
+    // 1. Create Supabase Auth user
+    const { data, error } = await supabaseClient.auth.signUp({ email, password });
+    if (error) return error.message;
 
-    // 2. Update Firebase Auth display name
-    await user.updateProfile({ displayName: username });
+    const user = data.user;
 
-    // 3. Create a Firestore profile document
-    await userDoc(user.uid).set({
-      uid: user.uid,
-      username: username,
-      email: email,
-      bio: "",
-      avatarURL: "",
-      bannerURL: "",
-      createdAt: firebase.firestore.FieldValue.serverTimestamp()
-    });
+    // 2. Create a profile row in the profiles table
+    const { error: profileError } = await supabaseClient
+      .from("profiles")
+      .insert({
+        id: user.id,
+        username: username,
+        email: email,
+        bio: "",
+        avatarURL: "",
+        bannerURL: ""
+      });
 
-    // 4. Redirect to the game library
+    if (profileError) return profileError.message;
+
+    // 3. Redirect to library
     window.location.href = "library.html";
 
-  } catch (error) {
-    return error.message;
+  } catch (err) {
+    return err.message;
   }
 }
 
-// ── Log In ──────────────────────────────────────────────────
+// ── Log In ───────────────────────────────────────────────────
 async function logIn(email, password) {
   try {
-    await auth.signInWithEmailAndPassword(email, password);
+    const { error } = await supabaseClient.auth.signInWithPassword({ email, password });
+    if (error) return error.message;
     window.location.href = "library.html";
-  } catch (error) {
-    return error.message;
+  } catch (err) {
+    return err.message;
   }
 }
 
-// ── Log Out ─────────────────────────────────────────────────
+// ── Log Out ──────────────────────────────────────────────────
 async function logOut() {
   try {
-    await auth.signOut();
+    await supabaseClient.auth.signOut();
     window.location.href = "../index.html";
-  } catch (error) {
-    console.error("Logout error:", error.message);
+  } catch (err) {
+    console.error("Logout error:", err.message);
   }
 }
 
-// ── Password Reset ──────────────────────────────────────────
+// ── Password Reset ───────────────────────────────────────────
 async function resetPassword(email) {
   try {
-    await auth.sendPasswordResetEmail(email);
-    return null; // success
-  } catch (error) {
-    return error.message;
+    const { error } = await supabaseClient.auth.resetPasswordForEmail(email);
+    if (error) return error.message;
+    return null; // null = success
+  } catch (err) {
+    return err.message;
   }
-}
-
-// ── Get Current User ────────────────────────────────────────
-function getCurrentUser() {
-  return auth.currentUser;
 }

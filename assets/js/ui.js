@@ -26,17 +26,29 @@ function renderGameCard(game) {
         ? `<img src="${game.coverURL}" alt="${game.title} cover" class="card-cover" />`
         : `<div class="card-cover-placeholder">🎮</div>`;
 
+    // Build star snippet (filled stars only, max 5)
+    let starsHTML = "";
+    if (game.rating && game.rating > 0) {
+        starsHTML = `<div class="card-stars">`;
+        for (let i = 1; i <= 5; i++) {
+            starsHTML += `<span class="star ${i <= game.rating ? "filled" : "empty"}">★</span>`;
+        }
+        starsHTML += `</div>`;
+    }
+
     card.innerHTML = `
     ${coverHTML}
     <div class="card-body">
       <div class="card-top">
         <span class="card-badge ${statusClass}">${statusLabel}</span>
-        <button class="card-fav ${game.favorite ? "active" : ""}" data-id="${game.id}" data-fav="${game.favorite}" title="Favorite">♥</button>
+        <button class="card-fav ${game.favorite ? "active" : ""}" data-id="${game.id}" data-fav="${game.favorite}" title="Favourite">♥</button>
       </div>
       <h3 class="card-title">${game.title}</h3>
       <p class="card-genre">${game.genre || "No genre"}</p>
       <p class="card-platform">${game.platform || ""}</p>
+      ${starsHTML}
       <div class="card-actions">
+        <a class="card-btn btn-view" href="game-detail.html?id=${game.id}">View</a>
         <button class="card-btn btn-edit" data-id="${game.id}">Edit</button>
         <button class="card-btn btn-delete" data-id="${game.id}">Delete</button>
       </div>

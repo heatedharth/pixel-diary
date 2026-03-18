@@ -1,32 +1,18 @@
 // ============================================================
-// db.js — Firebase Initialization
-// Initializes Firebase app, Auth, and Firestore.
-// All other JS files import from here.
+// db.js — Supabase Initialization & Shared Helpers
+// supabase.config.js must be loaded before this file.
+// All other JS files depend on this file.
 // ============================================================
 
-// Firebase is loaded via CDN <script> tags on each page.
-// firebase.config.js must be loaded before this file.
+// ── Cached current user ───────────────────────────────────────
+// Set by app.js onAuthStateChange. Other files call getCurrentUser().
+let _currentUser = null;
 
-// Initialize Firebase app
-firebase.initializeApp(firebaseConfig);
-
-// Export shared instances
-const auth = firebase.auth();
-const db = firebase.firestore();
-
-// ── Firestore Collection Helpers ────────────────────────────
-
-/** Reference to a user's profile doc */
-function userDoc(uid) {
-    return db.collection("users").doc(uid);
+function getCurrentUser() {
+    // Return user with .uid alias so all existing code works unchanged
+    return _currentUser ? { ..._currentUser, uid: _currentUser.id } : null;
 }
 
-/** Reference to a user's games subcollection */
-function gamesCol(uid) {
-    return db.collection("users").doc(uid).collection("games");
-}
-
-/** Reference to a single game doc */
-function gameDoc(uid, gameId) {
-    return gamesCol(uid).doc(gameId);
+function _setCurrentUser(user) {
+    _currentUser = user;
 }

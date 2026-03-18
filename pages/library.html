@@ -37,47 +37,89 @@
 
     <!-- ==================== LIBRARY HEADER ==================== -->
     <div class="library-header">
-        <h1>My Library</h1>
+        <div class="library-title-group">
+            <h1>My Library</h1>
+            <span class="game-count" id="game-count"></span>
+        </div>
         <button class="add-game-btn" id="add-game-btn">+ Add Game</button>
+    </div>
+
+    <!-- ==================== STATS BAR ==================== -->
+    <div class="stats-bar" id="stats-bar">
+        <div class="stat-card">
+            <span class="stat-number" id="stat-total">0</span>
+            <span class="stat-label">Total Games</span>
+        </div>
+        <div class="stat-card">
+            <span class="stat-number stat-playing" id="stat-playing">0</span>
+            <span class="stat-label">Playing</span>
+        </div>
+        <div class="stat-card">
+            <span class="stat-number stat-played" id="stat-played">0</span>
+            <span class="stat-label">Played</span>
+        </div>
+        <div class="stat-card">
+            <span class="stat-number stat-plan" id="stat-plan">0</span>
+            <span class="stat-label">Plan to Play</span>
+        </div>
+        <div class="stat-card">
+            <span class="stat-number stat-fav" id="stat-fav">0</span>
+            <span class="stat-label">Favourites</span>
+        </div>
+    </div>
+
+    <!-- ==================== FILTER BAR ==================== -->
+    <div class="filter-bar" id="filter-bar">
+        <div class="filter-search-wrap">
+            <span class="filter-search-icon">🔍</span>
+            <input type="text" id="search-input" class="filter-search" placeholder="Search games..."
+                autocomplete="off" />
+            <button class="filter-search-clear" id="search-clear" title="Clear search">✕</button>
+        </div>
+        <select id="filter-genre" class="filter-select">
+            <option value="all">All Genres</option>
+        </select>
+        <select id="filter-status" class="filter-select">
+            <option value="all">All Statuses</option>
+            <option value="playing">Playing</option>
+            <option value="played">Played</option>
+            <option value="plan-to-play">Plan to Play</option>
+        </select>
+        <select id="sort-select" class="filter-select">
+            <option value="date">Newest First</option>
+            <option value="az">A → Z</option>
+            <option value="za">Z → A</option>
+            <option value="rating">Top Rated</option>
+            <option value="most-played">Most Played</option>
+            <option value="genre">By Genre</option>
+        </select>
+        <button class="filter-clear-btn" id="filter-clear-btn">Clear Filters</button>
     </div>
 
     <!-- ==================== GAME GRID ==================== -->
     <div class="game-grid-container">
-
-        <!-- Loading spinner -->
         <div id="spinner">
             <div class="spinner-ring"></div>
         </div>
-
-        <!-- Empty state -->
         <div id="empty-state" style="display:none;">
-            <span class="empty-icon">🎮</span>
-            <p>No games yet! Add your first game to get started.</p>
+            <span class="empty-icon" id="empty-icon">🎮</span>
+            <p id="empty-message">No games yet! Add your first game to get started.</p>
         </div>
-
-        <!-- Game cards render here -->
         <div id="game-grid"></div>
-
     </div>
 
     <!-- ==================== ADD / EDIT MODAL ==================== -->
     <div class="modal-backdrop" id="game-modal">
         <div class="modal-card">
-
             <div class="modal-header">
                 <h2 id="modal-title">Add Game</h2>
                 <button class="modal-close" id="modal-close-btn">✕</button>
             </div>
-
             <form class="modal-form" id="game-form">
-
-                <!-- Title -->
                 <div class="form-group">
                     <label for="field-title">Game Title *</label>
                     <input type="text" id="field-title" placeholder="e.g. Hollow Knight" required />
                 </div>
-
-                <!-- Genre + Platform -->
                 <div class="modal-form-row">
                     <div class="form-group">
                         <label for="field-genre">Genre</label>
@@ -88,8 +130,6 @@
                         <input type="text" id="field-platform" placeholder="e.g. PC, Switch" />
                     </div>
                 </div>
-
-                <!-- Status + Hours -->
                 <div class="modal-form-row">
                     <div class="form-group">
                         <label for="field-status">Status</label>
@@ -104,18 +144,14 @@
                         <input type="number" id="field-hours" placeholder="0" min="0" step="0.5" />
                     </div>
                 </div>
-
-                <!-- Cover Image URL -->
                 <div class="form-group">
                     <label for="field-cover">Cover Image URL</label>
                     <input type="url" id="field-cover" placeholder="https://..." />
                 </div>
-
                 <div class="modal-actions">
                     <button type="submit" class="modal-btn-primary" id="modal-save-btn">Save Game</button>
                     <button type="button" class="modal-btn-secondary" id="modal-cancel-btn">Cancel</button>
                 </div>
-
             </form>
         </div>
     </div>
@@ -137,14 +173,15 @@
     <div class="toast" id="toast"></div>
 
     <!-- ==================== SCRIPTS ==================== -->
-    <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-auth-compat.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
-    <script src="../firebase.config.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script src="../supabase.config.js"></script>
     <script src="../assets/js/db.js"></script>
     <script src="../assets/js/auth.js"></script>
     <script src="../assets/js/app.js"></script>
     <script src="../assets/js/games.js"></script>
+    <script src="../assets/js/search-filter.js"></script>
+    <script src="../assets/js/sort.js"></script>
+    <script src="../assets/js/reviews.js"></script>
     <script src="../assets/js/ui.js"></script>
     <script src="../assets/js/library.js"></script>
 

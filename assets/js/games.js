@@ -1,92 +1,98 @@
 // ============================================================
-// games.js — Game CRUD Operations
-// All reads/writes to the user's games subcollection.
-// Depends on: db.js (db, gamesCol, gameDoc)
+// games.js — Game CRUD Operations (Supabase)
+// All reads/writes to the games table.
+// Depends on: supabase.config.js (supabaseClient)
 // ============================================================
 
-// ── Add Game ────────────────────────────────────────────────
+// ── Add Game ─────────────────────────────────────────────────
 async function addGame(uid, gameData) {
-    try {
-        const docRef = await gamesCol(uid).add({
+    const { data, error } = await supabaseClient
+        .from("games")
+        .insert({
+            userId: uid,
             ...gameData,
             favorite: false,
-            createdAt: firebase.firestore.FieldValue.serverTimestamp(),
-            updatedAt: firebase.firestore.FieldValue.serverTimestamp()
-        });
-        return { id: docRef.id, error: null };
-    } catch (error) {
-        return { id: null, error: error.message };
-    }
+            createdAt: new Date().toISOString(),
+            updatedAt: new Date().toISOString()
+        })
+        .select()
+        .single();
+
+    if (error) return { id: null, error: error.message };
+    return { id: data.id, error: null };
 }
 
-// ── Get All Games ────────────────────────────────────────────
+// ── Get All Games ─────────────────────────────────────────────
 async function getGames(uid) {
-    try {
-        const snapshot = await gamesCol(uid).orderBy("createdAt", "desc").get();
-        return snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
-    } catch (error) {
+    const { data, error } = await supabaseClient
+        .from("games")
+        .select("*")
+        .eq("userId", uid)
+        .order("createdAt", { ascending: false });
+
+    if (error) {
         console.error("getGames error:", error.message);
         return [];
     }
+    return data;
 }
 
-// ── Get Single Game ──────────────────────────────────────────
+// ── Get Single Game ───────────────────────────────────────────
 async function getGameById(uid, gameId) {
-    try {
-        const doc = await gameDoc(uid, gameId).get();
-        if (doc.exists) return { id: doc.id, ...doc.data() };
-        return null;
-    } catch (error) {
+    const { data, error } = await supabaseClient
+        .from("games")
+        .select("*")
+        .eq("userId", uid)
+        .eq("id", gameId)
+        .single();
+
+    if (error) {
         console.error("getGameById error:", error.message);
         return null;
     }
+    return data;
 }
 
-// ── Update Game ──────────────────────────────────────────────
+// ── Update Game ───────────────────────────────────────────────
 async function updateGame(uid, gameId, updatedData) {
-    try {
-        await gameDoc(uid, gameId).update({
-            ...updatedData,
-            updatedAt: firebase.firestore.FieldValue.serverTimestamp()
-        });
-        return null; // null = success
-    } catch (error) {
-        return error.message;
-    }
+    const { error } = await supabaseClient
+        .from("games")
+        .update({ ...updatedData, updatedAt: new Date().toISOString() })
+        .eq("id", gameId)
+        .eq("userId", uid);
+
+    return error ? error.message : null;
 }
 
-// ── Delete Game ──────────────────────────────────────────────
+// ── Delete Game ───────────────────────────────────────────────
 async function deleteGame(uid, gameId) {
-    try {
-        await gameDoc(uid, gameId).delete();
-        return null;
-    } catch (error) {
-        return error.message;
-    }
+    const { error } = await supabaseClient
+        .from("games")
+        .delete()
+        .eq("id", gameId)
+        .eq("userId", uid);
+
+    return error ? error.message : null;
 }
 
-// ── Toggle Favorite ──────────────────────────────────────────
+// ── Toggle Favorite ───────────────────────────────────────────
 async function toggleFavorite(uid, gameId, currentValue) {
-    try {
-        await gameDoc(uid, gameId).update({
-            favorite: !currentValue,
-            updatedAt: firebase.firestore.FieldValue.serverTimestamp()
-        });
-        return null;
-    } catch (error) {
-        return error.message;
-    }
+    const { error } = await supabaseClient
+        .from("games")
+        .update({ favorite: !currentValue, updatedAt: new Date().toISOString() })
+        .eq("id", gameId)
+        .eq("userId", uid);
+
+    return error ? error.message : null;
 }
 
-// ── Update Play Status ───────────────────────────────────────
+// ── Update Play Status ────────────────────────────────────────
 async function updatePlayStatus(uid, gameId, status) {
-    try {
-        await gameDoc(uid, gameId).update({
-            status: status,
-            updatedAt: firebase.firestore.FieldValue.serverTimestamp()
-        });
-        return null;
-    } catch (error) {
-        return error.message;
-    }
+    const { error } = await supabaseClient
+        .from("games")
+        .update({ status, updatedAt: new Date().toISOString() })
+        .eq("id", gameId)
+        .eq("userId", uid);
+
+    return error ? error.message : null;
 }

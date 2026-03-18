@@ -18,17 +18,12 @@
   <header>
     <nav>
       <div class="nav-logo">
-        <!-- TODO: Replace text with logo image when designed -->
         <span>🎮 Pixel Diary</span>
       </div>
-
-      <!-- Logged OUT: show Log In + Sign Up -->
       <ul class="nav-links" id="nav-logged-out">
         <li><a href="pages/login.html">Log In</a></li>
         <li><a href="pages/signup.html">Sign Up</a></li>
       </ul>
-
-      <!-- Logged IN: show My Library, Profile, Log Out -->
       <ul class="nav-links" id="nav-logged-in" style="display:none;">
         <li><a href="pages/library.html">My Library</a></li>
         <li><a href="pages/profile.html">Profile</a></li>
@@ -52,55 +47,43 @@
           <a href="pages/login.html">Log In</a>
         </div>
       </div>
-      <div class="hero-image">
-        <!-- TODO: Add hero illustration/mascot image here -->
-        <!-- TODO: Replace emoji with mascot illustration when designed -->
-        🎮
-      </div>
+      <div class="hero-image">🎮</div>
     </section>
 
     <!-- ==================== FEATURES SECTION ==================== -->
     <section class="features">
       <h2>Everything in One Place</h2>
       <div class="features-grid">
-
         <div class="feature-card">
-          <!-- TODO: Add icon -->
           <span class="feature-icon">📚</span>
           <h3>Game Library</h3>
           <p>Browse and manage your entire game collection in one place.</p>
         </div>
-
         <div class="feature-card">
           <span class="feature-icon">🎯</span>
           <h3>Track Your Progress</h3>
           <p>Mark games as Plan to Play, Playing, or Played.</p>
         </div>
-
         <div class="feature-card">
           <span class="feature-icon">⭐</span>
           <h3>Rate & Review</h3>
           <p>Leave star ratings and personal reviews on every game.</p>
         </div>
-
         <div class="feature-card">
           <span class="feature-icon">🔍</span>
           <h3>Search & Filter</h3>
           <p>Find any game fast — filter by genre, status, or rating.</p>
         </div>
-
         <div class="feature-card">
           <span class="feature-icon">📸</span>
           <h3>Media Uploads</h3>
           <p>Save screenshots and clips directly to your game entries.</p>
         </div>
-
         <div class="feature-card">
           <span class="feature-icon">🌸</span>
           <h3>Your Profile</h3>
           <p>Customize your profile, show off your favorites, and make it yours.</p>
         </div>
-
       </div>
     </section>
 
@@ -122,12 +105,9 @@
     <p>&copy; 2025 Pixel Diary. Made with 💖 for gamers.</p>
   </footer>
 
-  <!-- Firebase SDK -->
-  <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
-  <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-auth-compat.js"></script>
-  <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
-  <!-- App scripts -->
-  <script src="firebase.config.js"></script>
+  <!-- ==================== SCRIPTS ==================== -->
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="supabase.config.js"></script>
   <script src="assets/js/db.js"></script>
   <script src="assets/js/auth.js"></script>
   <script src="assets/js/app.js"></script>

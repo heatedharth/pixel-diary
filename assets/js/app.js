@@ -1,17 +1,18 @@
 // ============================================================
 // app.js — App Entry Point
-// Runs on every page. Handles auth state and navbar updates.
-// Depends on: db.js, auth.js
+// Runs on every page. Manages auth state and navbar.
+// Depends on: supabase.config.js, db.js, auth.js
 // ============================================================
 
-// ── Auth State Listener ─────────────────────────────────────
-// Fires whenever the user logs in or out.
-// Updates the navbar to show the right links.
-auth.onAuthStateChanged((user) => {
+// ── Auth State Listener ───────────────────────────────────────
+// Fires on every page load and whenever auth state changes.
+supabaseClient.auth.onAuthStateChange((event, session) => {
+    const user = session?.user ?? null;
+    _setCurrentUser(user);
     updateNavbar(user);
 });
 
-// ── Navbar Update ───────────────────────────────────────────
+// ── Navbar Update ─────────────────────────────────────────────
 function updateNavbar(user) {
     const loggedOutLinks = document.getElementById("nav-logged-out");
     const loggedInLinks = document.getElementById("nav-logged-in");
@@ -20,28 +21,31 @@ function updateNavbar(user) {
     if (!loggedOutLinks || !loggedInLinks) return;
 
     if (user) {
-        // User is signed in — show library/profile/logout
         loggedOutLinks.style.display = "none";
         loggedInLinks.style.display = "flex";
 
-        // Wire up logout button
         if (logoutBtn) {
-            logoutBtn.addEventListener("click", () => logOut());
+            // Remove any existing listener before adding to avoid duplicates
+            logoutBtn.replaceWith(logoutBtn.cloneNode(true));
+            document.getElementById("logout-btn").addEventListener("click", (e) => {
+                e.preventDefault();
+                logOut();
+            });
         }
     } else {
-        // User is signed out — show login/signup
         loggedOutLinks.style.display = "flex";
         loggedInLinks.style.display = "none";
     }
 }
 
-// ── Page Protection ─────────────────────────────────────────
-// Call this on any page that requires login.
-// Redirects to login if not authenticated.
-function requireAuth(redirectPath = "../pages/login.html") {
-    auth.onAuthStateChanged((user) => {
-        if (!user) {
-            window.location.href = redirectPath;
-        }
-    });
+// ── Page Protection ───────────────────────────────────────────
+// Call on any page that requires login.
+// Checks the session once on load and redirects if not logged in.
+async function requireAuth(redirectPath = "../pages/login.html") {
+    const { data: { session } } = await supabaseClient.auth.getSession();
+    if (!session) {
+        window.location.href = redirectPath;
+    } else {
+        _setCurrentUser(session.user);
+    }
 }
