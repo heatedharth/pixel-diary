@@ -5,7 +5,6 @@
 // ============================================================
 
 // ── Auth State Listener ───────────────────────────────────────
-// Fires on every page load and whenever auth state changes.
 supabaseClient.auth.onAuthStateChange((event, session) => {
     const user = session?.user ?? null;
     _setCurrentUser(user);
@@ -24,13 +23,13 @@ function updateNavbar(user) {
         loggedOutLinks.style.display = "none";
         loggedInLinks.style.display = "flex";
 
+        // Use onclick so repeated calls simply overwrite — no duplicate listeners,
+        // no replaceWith racing issues
         if (logoutBtn) {
-            // Remove any existing listener before adding to avoid duplicates
-            logoutBtn.replaceWith(logoutBtn.cloneNode(true));
-            document.getElementById("logout-btn").addEventListener("click", (e) => {
+            logoutBtn.onclick = (e) => {
                 e.preventDefault();
                 logOut();
-            });
+            };
         }
     } else {
         loggedOutLinks.style.display = "flex";
@@ -39,8 +38,6 @@ function updateNavbar(user) {
 }
 
 // ── Page Protection ───────────────────────────────────────────
-// Call on any page that requires login.
-// Checks the session once on load and redirects if not logged in.
 async function requireAuth(redirectPath = "../pages/login.html") {
     const { data: { session } } = await supabaseClient.auth.getSession();
     if (!session) {
