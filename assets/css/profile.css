@@ -1,0 +1,508 @@
+/* ============================================================
+   profile.css — User Profile Page Styles
+   Lolita Arcade theme
+   ============================================================ */
+
+.profile-page {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  background: var(--off-white);
+}
+
+/* ── Banner ── */
+.profile-banner {
+  width: 100%;
+  height: 220px;
+  background: linear-gradient(135deg, var(--pink-light) 0%, var(--purple-light) 100%);
+  position: relative;
+  overflow: hidden;
+  background-size: cover;
+  background-position: center;
+}
+
+/* Pixel grid texture on banner */
+.profile-banner::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='8' height='8'%3E%3Crect width='1' height='1' fill='rgba(255,255,255,0.12)'/%3E%3C/svg%3E");
+  background-size: 8px 8px;
+  pointer-events: none;
+}
+
+/* Lace scallop at banner bottom */
+.profile-banner::after {
+  content: '';
+  position: absolute;
+  bottom: -1px;
+  left: 0;
+  right: 0;
+  height: 12px;
+  background: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='20' height='12'%3E%3Cpath d='M0 12 Q5 0 10 12 Q15 0 20 12' fill='%23FDF8FF' stroke='%23FFD9E4' stroke-width='1'/%3E%3C/svg%3E") repeat-x bottom / 20px 12px;
+  z-index: 2;
+}
+
+.profile-banner.has-image::before {
+  opacity: 0.3;
+}
+
+.banner-upload-btn {
+  position: absolute;
+  bottom: 1.5rem;
+  right: 1rem;
+  background: rgba(255, 255, 255, 0.25);
+  border: 1.5px solid rgba(255, 255, 255, 0.5);
+  border-radius: var(--radius-pill);
+  padding: 0.45rem 1rem;
+  font-family: var(--font-display);
+  font-size: 1rem;
+  cursor: pointer;
+  color: white;
+  backdrop-filter: blur(6px);
+  transition: background 0.18s, transform 0.15s;
+  z-index: 3;
+}
+
+.banner-upload-btn:hover {
+  background: rgba(255, 255, 255, 0.4);
+  transform: translateY(-1px);
+}
+
+/* ── Profile Header ── */
+.profile-header-wrap {
+  max-width: 900px;
+  margin: 0 auto;
+  width: 100%;
+  padding: 0 2rem;
+  display: flex;
+  align-items: flex-end;
+  gap: 1.5rem;
+  margin-top: -52px;
+  position: relative;
+  z-index: 2;
+}
+
+/* ── Avatar ── */
+.profile-avatar-wrap {
+  position: relative;
+  flex-shrink: 0;
+}
+
+.profile-avatar {
+  width: 110px;
+  height: 110px;
+  border-radius: 50%;
+  /* Lace/frilly border via layered box-shadow */
+  border: 4px solid white;
+  outline: 2px solid var(--pink-light);
+  background: linear-gradient(135deg, var(--pink), var(--purple));
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+  box-shadow: 0 4px 24px rgba(199, 168, 240, 0.40), 0 0 0 6px rgba(255, 217, 228, 0.30);
+  transition: box-shadow 0.22s;
+}
+
+.profile-avatar:hover {
+  box-shadow: 0 8px 32px rgba(199, 168, 240, 0.50), 0 0 0 6px rgba(255, 181, 198, 0.35);
+}
+
+.avatar-img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.avatar-initials {
+  font-family: var(--font-display);
+  font-size: 2.5rem;
+  color: white;
+  line-height: 1;
+  filter: drop-shadow(0 1px 3px rgba(0, 0, 0, 0.2));
+}
+
+.avatar-upload-btn {
+  position: absolute;
+  bottom: 2px;
+  right: 2px;
+  background: white;
+  border: 1.5px solid var(--pink-light);
+  border-radius: 50%;
+  width: 32px;
+  height: 32px;
+  font-size: 0.9rem;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.12);
+  transition: background 0.18s, transform 0.18s;
+}
+
+.avatar-upload-btn:hover {
+  background: var(--pink-light);
+  transform: rotate(15deg) scale(1.1);
+}
+
+/* ── Identity ── */
+.profile-identity {
+  flex: 1;
+  padding-bottom: 0.5rem;
+}
+
+.profile-username {
+  font-family: var(--font-display);
+  font-size: 2rem;
+  background: linear-gradient(135deg, var(--pink-deep), var(--purple-deep));
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  line-height: 1.2;
+  margin-bottom: 0.2rem;
+  filter: drop-shadow(0 1px 4px rgba(248, 146, 170, 0.2));
+}
+
+.profile-email {
+  font-size: 1rem;
+  color: var(--text-soft);
+  margin-bottom: 0.4rem;
+}
+
+.profile-bio {
+  font-size: 1.2rem;
+  color: var(--text-mid);
+  line-height: 1.6;
+  margin-bottom: 0.75rem;
+}
+
+/* ── Actions ── */
+.profile-actions {
+  display: flex;
+  gap: 0.75rem;
+  flex-wrap: wrap;
+}
+
+.profile-edit-btn {
+  font-family: var(--font-display);
+  font-size: 1rem;
+  padding: 0.5rem 1.2rem;
+  border-radius: var(--radius-pill);
+  border: 1.5px solid var(--purple-light);
+  background: white;
+  color: var(--text-mid);
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  transition: background 0.18s, border-color 0.18s, transform 0.15s;
+}
+
+.profile-edit-btn:hover {
+  background: var(--surface);
+  border-color: var(--purple);
+  transform: translateY(-1px);
+}
+
+.profile-logout-btn {
+  font-family: var(--font-display);
+  font-size: 1rem;
+  padding: 0.5rem 1.2rem;
+  border-radius: var(--radius-pill);
+  border: 1.5px solid var(--pink-light);
+  background: white;
+  color: var(--pink-deep);
+  cursor: pointer;
+  transition: background 0.18s, transform 0.15s;
+}
+
+.profile-logout-btn:hover {
+  background: var(--pink-light);
+  transform: translateY(-1px);
+}
+
+/* ── Sections ── */
+.profile-section {
+  max-width: 900px;
+  margin: 2rem auto 0;
+  width: 100%;
+  padding: 0 2rem;
+}
+
+.profile-section-title {
+  font-family: var(--font-display);
+  font-size: 1.5rem;
+  color: var(--text-dark);
+  margin-bottom: 1.25rem;
+  padding-bottom: 0.6rem;
+  border-bottom: 1.5px solid var(--pink-light);
+  position: relative;
+}
+
+/* Pearl dot trim */
+.profile-section-title::before {
+  content: '♥ ';
+  color: var(--pink);
+  font-size: 0.9em;
+  font-family: var(--font-display);
+}
+
+/* ── Edit Form ── */
+.profile-edit-form {
+  max-width: 900px;
+  margin: 1.5rem auto 0;
+  width: 100%;
+  padding: 0 2rem;
+}
+
+/* Form card style */
+.profile-edit-form .profile-section {
+  background: white;
+  border: 1.5px solid var(--pink-light);
+  border-radius: var(--radius-lg);
+  padding: 1.75rem;
+  margin: 0;
+  box-shadow: var(--shadow-card);
+  background-image:
+    radial-gradient(circle at 100% 0%, rgba(255, 181, 198, 0.07) 30px, transparent 30px);
+}
+
+.profile-bio-input {
+  font-family: var(--font-body);
+  font-size: 1.1rem;
+  padding: 0.75rem 1rem;
+  border: 1.5px solid var(--purple-light);
+  border-radius: 14px;
+  background: var(--surface);
+  color: var(--text-dark);
+  resize: vertical;
+  min-height: 90px;
+  outline: none;
+  width: 100%;
+  transition: border-color 0.2s, box-shadow 0.2s;
+}
+
+.profile-bio-input:focus {
+  border-color: var(--pink);
+  box-shadow: 0 0 0 3px rgba(255, 181, 198, 0.2);
+}
+
+.profile-form-actions {
+  display: flex;
+  gap: 0.75rem;
+  margin-top: 1rem;
+}
+
+/* ── Stats ── */
+.profile-stats {
+  display: flex;
+  gap: 1rem;
+  flex-wrap: wrap;
+}
+
+.pstat-card {
+  flex: 1;
+  min-width: 110px;
+  background: white;
+  border: 1.5px solid var(--purple-light);
+  border-radius: var(--radius-lg);
+  padding: 1.1rem 1rem;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.25rem;
+  transition: transform 0.18s, box-shadow 0.18s, border-color 0.18s;
+  position: relative;
+  overflow: hidden;
+  cursor: default;
+}
+
+/* Pixel corner on stat card */
+.pstat-card::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 24px;
+  height: 24px;
+  background: radial-gradient(circle at 0% 0%, var(--pink-light) 16px, transparent 16px);
+  opacity: 0.5;
+}
+
+.pstat-card:hover {
+  transform: translateY(-3px);
+  box-shadow: var(--shadow-card);
+  border-color: var(--pink);
+}
+
+.pstat-number {
+  font-family: var(--font-display);
+  font-size: 2.2rem;
+  color: var(--text-dark);
+  line-height: 1;
+}
+
+.pstat-number.pstat-played {
+  color: #2e7d52;
+}
+
+.pstat-number.pstat-playing {
+  color: var(--purple-deep);
+}
+
+.pstat-number.pstat-plan {
+  color: #c0405a;
+}
+
+.pstat-number.pstat-fav {
+  color: var(--pink-deep);
+}
+
+.pstat-label {
+  font-size: 1rem;
+  color: var(--text-soft);
+  text-align: center;
+}
+
+/* ── Favorites Grid ── */
+.favorites-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
+  gap: 1rem;
+}
+
+.fav-card {
+  text-decoration: none;
+  background: white;
+  border: 1.5px solid var(--purple-light);
+  border-radius: var(--radius-lg);
+  overflow: hidden;
+  transition: transform 0.2s, box-shadow 0.2s, border-color 0.2s;
+  position: relative;
+}
+
+/* Pixel heart on fav card */
+.fav-card::before {
+  content: '♥';
+  position: absolute;
+  top: 0.4rem;
+  right: 0.5rem;
+  font-size: 0.75rem;
+  color: white;
+  z-index: 2;
+  text-shadow: 0 1px 3px rgba(0, 0, 0, 0.2);
+  font-family: var(--font-display);
+}
+
+.fav-card:hover {
+  transform: translateY(-5px) rotate(-0.5deg);
+  box-shadow: var(--shadow-lift);
+  border-color: var(--pink);
+}
+
+.fav-cover {
+  width: 100%;
+  height: 120px;
+  object-fit: cover;
+  display: block;
+}
+
+.fav-cover-placeholder {
+  width: 100%;
+  height: 120px;
+  background: linear-gradient(135deg, var(--pink-light), var(--purple-light));
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 2.5rem;
+}
+
+.fav-info {
+  padding: 0.6rem 0.75rem 0.75rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.35rem;
+}
+
+.fav-title {
+  font-family: var(--font-display);
+  font-size: 0.95rem;
+  color: var(--text-dark);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.fav-badge {
+  font-size: 0.75rem;
+}
+
+/* ── Empty ── */
+.profile-empty-msg {
+  font-size: 1.15rem;
+  color: var(--text-soft);
+  padding: 1rem 0;
+}
+
+/* ── Toast ── */
+.toast {
+  position: fixed;
+  bottom: 2rem;
+  left: 50%;
+  transform: translateX(-50%) translateY(20px);
+  padding: 0.8rem 1.75rem;
+  border-radius: var(--radius-pill);
+  font-family: var(--font-display);
+  font-size: 1.1rem;
+  color: white;
+  opacity: 0;
+  transition: opacity 0.3s, transform 0.3s;
+  z-index: 500;
+  pointer-events: none;
+  border: 1.5px solid rgba(255, 255, 255, 0.2);
+}
+
+.toast.show {
+  opacity: 1;
+  transform: translateX(-50%) translateY(0);
+}
+
+.toast-success {
+  background: linear-gradient(135deg, var(--pink), var(--purple));
+  box-shadow: var(--shadow-pink);
+}
+
+.toast-error {
+  background: linear-gradient(135deg, #f892aa, #e05577);
+}
+
+.toast-info {
+  background: linear-gradient(135deg, var(--purple), var(--purple-deep));
+}
+
+/* ── Responsive ── */
+@media (max-width: 640px) {
+  .profile-header-wrap {
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+    margin-top: -56px;
+  }
+
+  .profile-actions {
+    justify-content: center;
+  }
+
+  .profile-stats {
+    gap: 0.75rem;
+  }
+
+  .pstat-card {
+    min-width: calc(50% - 0.75rem);
+  }
+
+  .favorites-grid {
+    grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
+  }
+}
