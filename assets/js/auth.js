@@ -50,9 +50,12 @@ async function logIn(email, password) {
 async function logOut() {
   try {
     await supabaseClient.auth.signOut();
-    window.location.href = "../index.html";
   } catch (err) {
     console.error("Logout error:", err.message);
+  } finally {
+    // Always redirect regardless of whether signOut succeeded
+    const isInSubfolder = window.location.pathname.includes("/pages/");
+    window.location.href = isInSubfolder ? "../index.html" : "index.html";
   }
 }
 

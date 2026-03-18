@@ -63,22 +63,22 @@ function renderAvatar(profile) {
 // ── Render Username + Bio ─────────────────────────────────────
 function renderUserInfo(profile) {
   document.getElementById("profile-username").textContent = profile.username || "No username";
-  document.getElementById("profile-bio").textContent      = profile.bio || "No bio yet — add one!";
-  document.getElementById("profile-email").textContent    = profile.email || "";
+  document.getElementById("profile-bio").textContent = profile.bio || "No bio yet — add one!";
+  document.getElementById("profile-email").textContent = profile.email || "";
 }
 
 // ── Render Stats ──────────────────────────────────────────────
 function renderStats(stats) {
-  document.getElementById("pstat-total").textContent     = stats.total;
-  document.getElementById("pstat-played").textContent    = stats.played;
-  document.getElementById("pstat-playing").textContent   = stats.playing;
-  document.getElementById("pstat-plan").textContent      = stats.plan;
+  document.getElementById("pstat-total").textContent = stats.total;
+  document.getElementById("pstat-played").textContent = stats.played;
+  document.getElementById("pstat-playing").textContent = stats.playing;
+  document.getElementById("pstat-plan").textContent = stats.plan;
   document.getElementById("pstat-favorites").textContent = stats.favorites;
 }
 
 // ── Render Favorites Grid ─────────────────────────────────────
 function renderFavorites(games) {
-  const grid  = document.getElementById("favorites-grid");
+  const grid = document.getElementById("favorites-grid");
   const empty = document.getElementById("favorites-empty");
 
   grid.innerHTML = "";
@@ -104,9 +104,8 @@ function renderFavorites(games) {
         : `<div class="fav-cover-placeholder">🎮</div>`}
       <div class="fav-info">
         <p class="fav-title">${game.title}</p>
-        <span class="card-badge ${statusClass} fav-badge">${
-          { "played": "Played", "playing": "Playing", "plan-to-play": "Plan to Play" }[game.status] || ""
-        }</span>
+        <span class="card-badge ${statusClass} fav-badge">${{ "played": "Played", "playing": "Playing", "plan-to-play": "Plan to Play" }[game.status] || ""
+      }</span>
       </div>
     `;
 
@@ -114,29 +113,32 @@ function renderFavorites(games) {
   });
 }
 
+// ── Logout button ─────────────────────────────────────────────
+document.getElementById("profile-logout-btn").addEventListener("click", () => logOut());
+
 // ── Edit Profile Toggle ───────────────────────────────────────
-const editBtn   = document.getElementById("edit-profile-btn");
-const editForm  = document.getElementById("edit-profile-form");
+const editBtn = document.getElementById("edit-profile-btn");
+const editForm = document.getElementById("edit-profile-form");
 const cancelBtn = document.getElementById("edit-cancel-btn");
 
 editBtn.addEventListener("click", () => {
   // Pre-fill form with current values
   document.getElementById("edit-username").value = currentProfile?.username || "";
-  document.getElementById("edit-bio").value      = currentProfile?.bio      || "";
+  document.getElementById("edit-bio").value = currentProfile?.bio || "";
   editForm.style.display = "block";
-  editBtn.style.display  = "none";
+  editBtn.style.display = "none";
 });
 
 cancelBtn.addEventListener("click", () => {
   editForm.style.display = "none";
-  editBtn.style.display  = "inline-flex";
+  editBtn.style.display = "inline-flex";
 });
 
 // ── Save Profile Text Fields ──────────────────────────────────
 document.getElementById("edit-profile-save").addEventListener("click", async () => {
-  const user     = getCurrentUser();
+  const user = getCurrentUser();
   const username = document.getElementById("edit-username").value.trim();
-  const bio      = document.getElementById("edit-bio").value.trim();
+  const bio = document.getElementById("edit-bio").value.trim();
 
   if (!username) {
     showProfileToast("Username can't be empty.", "error");
@@ -149,7 +151,7 @@ document.getElementById("edit-profile-save").addEventListener("click", async () 
   } else {
     showProfileToast("Profile updated! ✨", "success");
     editForm.style.display = "none";
-    editBtn.style.display  = "inline-flex";
+    editBtn.style.display = "inline-flex";
     await loadProfile();
   }
 });
@@ -159,7 +161,7 @@ document.getElementById("avatar-upload-input").addEventListener("change", async 
   const file = e.target.files[0];
   if (!file) return;
 
-  const user   = getCurrentUser();
+  const user = getCurrentUser();
   showProfileToast("Uploading avatar...", "info");
 
   const result = await uploadAvatar(user.uid, file);
@@ -177,7 +179,7 @@ document.getElementById("banner-upload-input").addEventListener("change", async 
   const file = e.target.files[0];
   if (!file) return;
 
-  const user   = getCurrentUser();
+  const user = getCurrentUser();
   showProfileToast("Uploading banner...", "info");
 
   const result = await uploadBanner(user.uid, file);
@@ -195,6 +197,6 @@ function showProfileToast(message, type = "info") {
   const toast = document.getElementById("toast");
   if (!toast) return;
   toast.textContent = message;
-  toast.className   = `toast toast-${type} show`;
+  toast.className = `toast toast-${type} show`;
   setTimeout(() => toast.classList.remove("show"), 3000);
 }

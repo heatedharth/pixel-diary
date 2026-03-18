@@ -27,8 +27,8 @@ async function getProfile(uid) {
 // ── Update Profile Fields ─────────────────────────────────────
 async function updateProfile(uid, { username, bio, avatarURL, bannerURL }) {
   const updates = {};
-  if (username  !== undefined) updates.username  = username;
-  if (bio       !== undefined) updates.bio       = bio;
+  if (username !== undefined) updates.username = username;
+  if (bio !== undefined) updates.bio = bio;
   if (avatarURL !== undefined) updates.avatarURL = avatarURL;
   if (bannerURL !== undefined) updates.bannerURL = bannerURL;
 
@@ -41,15 +41,17 @@ async function updateProfile(uid, { username, bio, avatarURL, bannerURL }) {
 }
 
 // ── Upload Avatar ─────────────────────────────────────────────
-// Uploads to the avatars bucket and saves the URL to profiles.
 async function uploadAvatar(uid, file) {
-  const ext      = file.name.split(".").pop();
-  const path     = `${uid}/avatar_${Date.now()}.${ext}`;
+  const ext = file.name.split(".").pop().toLowerCase();
+  const path = `${uid}/avatar_${Date.now()}.${ext}`;
 
   const { error: uploadError } = await supabaseClient
     .storage
     .from(AVATAR_BUCKET)
-    .upload(path, file, { upsert: true });
+    .upload(path, file, {
+      upsert: true,
+      contentType: file.type
+    });
 
   if (uploadError) return { error: uploadError.message };
 
@@ -65,13 +67,16 @@ async function uploadAvatar(uid, file) {
 
 // ── Upload Banner ─────────────────────────────────────────────
 async function uploadBanner(uid, file) {
-  const ext  = file.name.split(".").pop();
+  const ext = file.name.split(".").pop().toLowerCase();
   const path = `${uid}/banner_${Date.now()}.${ext}`;
 
   const { error: uploadError } = await supabaseClient
     .storage
     .from(AVATAR_BUCKET)
-    .upload(path, file, { upsert: true });
+    .upload(path, file, {
+      upsert: true,
+      contentType: file.type
+    });
 
   if (uploadError) return { error: uploadError.message };
 
@@ -96,10 +101,10 @@ async function getProfileStats(uid) {
   if (error || !data) return { total: 0, played: 0, playing: 0, plan: 0, favorites: 0 };
 
   return {
-    total:     data.length,
-    played:    data.filter(g => g.status === "played").length,
-    playing:   data.filter(g => g.status === "playing").length,
-    plan:      data.filter(g => g.status === "plan-to-play").length,
+    total: data.length,
+    played: data.filter(g => g.status === "played").length,
+    playing: data.filter(g => g.status === "playing").length,
+    plan: data.filter(g => g.status === "plan-to-play").length,
     favorites: data.filter(g => g.favorite === true).length
   };
 }
