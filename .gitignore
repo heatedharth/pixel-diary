@@ -1,6 +1,3 @@
-# Supabase config (contains sensitive API keys)
-supabase.config.js
-
 # Firebase config (no longer used — kept here in case file still exists locally)
 firebase.config.js
 
