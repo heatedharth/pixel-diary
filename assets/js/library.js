@@ -8,12 +8,24 @@
 // ── Protect page — redirect if not logged in ─────────────────
 requireAuth("../pages/login.html");
 
+// ── Get user safely (fallback if cache not yet populated) ────
+async function getAuthUser() {
+    let user = getCurrentUser();
+    if (user) return user;
+    const { data: { session } } = await supabaseClient.auth.getSession();
+    if (session?.user) {
+        _setCurrentUser(session.user);
+        return getCurrentUser();
+    }
+    return null;
+}
+
 // ── Master games array (never re-fetched just to filter) ─────
 let allGames = [];
 
 // ── Load & Render Library ────────────────────────────────────
 async function loadLibrary() {
-    const user = getCurrentUser();
+    const user = await getAuthUser();
     if (!user) return;
 
     toggleLoadingSpinner(true);
@@ -44,8 +56,6 @@ function renderStats(games) {
 }
 
 // ── Populate Genre Dropdown ───────────────────────────────────
-// Builds the genre <select> from actual genres in the library.
-// Preserves the current selection if the genre still exists.
 function populateGenreDropdown(games) {
     const select = document.getElementById("filter-genre");
     const current = select.value;
@@ -59,13 +69,10 @@ function populateGenreDropdown(games) {
         select.appendChild(opt);
     });
 
-    // Restore previous selection if it's still valid
     if (genres.includes(current)) select.value = current;
 }
 
 // ── Apply Filters + Sort ──────────────────────────────────────
-// Reads current input values, runs combineFilters then applySort.
-// Stats always reflect the full library, not the filtered view.
 function applyFilters() {
     const query = document.getElementById("search-input").value;
     const genre = document.getElementById("filter-genre").value;
@@ -77,15 +84,12 @@ function applyFilters() {
 
     renderFilteredGrid(result);
 
-    // Show/hide clear button
     const hasFilters = query.trim() !== "" || genre !== "all" || status !== "all";
     document.getElementById("filter-clear-btn").style.display = hasFilters ? "inline-flex" : "none";
     document.getElementById("search-clear").style.display = query.trim() !== "" ? "flex" : "none";
 }
 
 // ── Render Filtered Grid ──────────────────────────────────────
-// Like renderGameGrid but handles the "no results" empty state
-// separately from the "no games at all" empty state.
 function renderFilteredGrid(games) {
     const grid = document.getElementById("game-grid");
     const empty = document.getElementById("empty-state");
@@ -97,11 +101,9 @@ function renderFilteredGrid(games) {
     if (games.length === 0) {
         empty.style.display = "flex";
         if (allGames.length === 0) {
-            // Truly empty library
             icon.textContent = "🎮";
             message.textContent = "No games yet! Add your first game to get started.";
         } else {
-            // Has games but none match the current filters
             icon.textContent = "🔍";
             message.textContent = "No games match your search. Try different filters!";
         }
@@ -115,9 +117,10 @@ function renderFilteredGrid(games) {
 
         card.querySelector(".card-fav").addEventListener("click", async (e) => {
             e.stopPropagation();
-            const uid = getCurrentUser().uid;
+            const user = await getAuthUser();
+            if (!user) return;
             const isFav = e.currentTarget.dataset.fav === "true";
-            await toggleFavorite(uid, game.id, isFav);
+            await toggleFavorite(user.uid, game.id, isFav);
             loadLibrary();
         });
 
@@ -141,14 +144,12 @@ document.getElementById("filter-genre").addEventListener("change", applyFilters)
 document.getElementById("filter-status").addEventListener("change", applyFilters);
 document.getElementById("sort-select").addEventListener("change", applyFilters);
 
-// Clear search ✕ button
 document.getElementById("search-clear").addEventListener("click", () => {
     document.getElementById("search-input").value = "";
     applyFilters();
     document.getElementById("search-input").focus();
 });
 
-// Clear all filters button
 document.getElementById("filter-clear-btn").addEventListener("click", () => {
     document.getElementById("search-input").value = "";
     document.getElementById("filter-genre").value = "all";
@@ -161,7 +162,12 @@ document.getElementById("filter-clear-btn").addEventListener("click", () => {
 document.getElementById("game-form").addEventListener("submit", async (e) => {
     e.preventDefault();
 
-    const user = getCurrentUser();
+    const user = await getAuthUser();
+    if (!user) {
+        showToast("Session expired. Please log in again.", "error");
+        return;
+    }
+
     const form = e.currentTarget;
     const mode = form.dataset.mode;
     const gameId = form.dataset.gameId;
@@ -213,7 +219,8 @@ document.getElementById("add-game-btn").addEventListener("click", () => openModa
 
 // ── Delete Confirm ───────────────────────────────────────────
 document.getElementById("confirm-delete-btn").addEventListener("click", async (e) => {
-    const user = getCurrentUser();
+    const user = await getAuthUser();
+    if (!user) return;
     const gameId = e.currentTarget.dataset.id;
 
     const error = await deleteGame(user.uid, gameId);
@@ -237,7 +244,6 @@ supabaseClient.auth.onAuthStateChange(async (event, session) => {
     _setCurrentUser(session.user);
     await loadLibrary();
 
-    // Auto-open edit modal if redirected from game-detail page
     const params = new URLSearchParams(window.location.search);
     const editId = params.get("edit");
     if (editId) {
