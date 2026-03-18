@@ -29,12 +29,17 @@ async function loadLibrary() {
     if (!user) return;
 
     toggleLoadingSpinner(true);
-    allGames = await getGames(user.uid);
-    toggleLoadingSpinner(false);
-
-    renderStats(allGames);
-    populateGenreDropdown(allGames);
-    applyFilters();
+    try {
+        allGames = await getGames(user.uid);
+        renderStats(allGames);
+        populateGenreDropdown(allGames);
+        applyFilters();
+    } catch (err) {
+        console.error("loadLibrary error:", err);
+        showToast("Error loading library. Please refresh.", "error");
+    } finally {
+        toggleLoadingSpinner(false);
+    }
 }
 
 // ── Render Stats Bar ─────────────────────────────────────────
@@ -239,16 +244,27 @@ document.getElementById("delete-modal").addEventListener("click", (e) => {
 });
 
 // ── Initial load ─────────────────────────────────────────────
+// Only load on INITIAL_SESSION and SIGNED_IN to avoid
+// multiple simultaneous loadLibrary() calls on token refresh
+let libraryLoaded = false;
 supabaseClient.auth.onAuthStateChange(async (event, session) => {
     if (!session?.user) return;
     _setCurrentUser(session.user);
-    await loadLibrary();
 
-    const params = new URLSearchParams(window.location.search);
-    const editId = params.get("edit");
-    if (editId) {
-        const game = allGames.find(g => g.id === editId);
-        if (game) openModal("edit", game);
-        window.history.replaceState({}, "", window.location.pathname);
+    if (event === "INITIAL_SESSION" || event === "SIGNED_IN") {
+        libraryLoaded = false;
+    }
+
+    if (!libraryLoaded) {
+        libraryLoaded = true;
+        await loadLibrary();
+
+        const params = new URLSearchParams(window.location.search);
+        const editId = params.get("edit");
+        if (editId) {
+            const game = allGames.find(g => g.id === editId);
+            if (game) openModal("edit", game);
+            window.history.replaceState({}, "", window.location.pathname);
+        }
     }
 });

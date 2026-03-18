@@ -422,9 +422,12 @@ document.addEventListener("keydown", (e) => {
 });
 
 // ── Initial load ──────────────────────────────────────────────
+let detailLoaded = false;
 supabaseClient.auth.onAuthStateChange((event, session) => {
-  if (session?.user) {
-    _setCurrentUser(session.user);
+  if (!session?.user) return;
+  _setCurrentUser(session.user);
+  if (!detailLoaded) {
+    detailLoaded = true;
     loadGame();
   }
 });

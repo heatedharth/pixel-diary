@@ -26,10 +26,14 @@ async function getAuthUser() {
 }
 
 // ── Initial load ──────────────────────────────────────────────
+let profileLoaded = false;
 supabaseClient.auth.onAuthStateChange(async (event, session) => {
   if (!session?.user) return;
   _setCurrentUser(session.user);
-  await loadProfile();
+  if (!profileLoaded) {
+    profileLoaded = true;
+    await loadProfile();
+  }
 });
 
 // ── Load everything ───────────────────────────────────────────
