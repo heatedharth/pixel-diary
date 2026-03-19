@@ -1,250 +1,143 @@
 // ============================================================
-// profile-page.js — Profile Page Logic
-// Depends on: supabase.config.js, db.js, auth.js, app.js,
-//             profile.js, games.js
+// profile.js — User Profile (Supabase)
+// Handles reading/updating profile data and avatar/banner uploads.
+// Storage bucket: "avatars" (public)
+// Storage path: avatars/{uid}/avatar_{timestamp}.ext
+//               avatars/{uid}/banner_{timestamp}.ext
+// Depends on: supabase.config.js (supabaseClient)
 // ============================================================
 
-let currentProfile = null;
+const AVATAR_BUCKET = "avatars";
 
-// ── Get user safely ───────────────────────────────────────────
-async function getAuthUser() {
-  let user = getCurrentUser();
-  if (user) return user;
-  const { data: { session } } = await supabaseClient.auth.getSession();
-  if (session?.user) {
-    _setCurrentUser(session.user);
-    return getCurrentUser();
+// ── Get Profile ───────────────────────────────────────────────
+async function getProfile(uid) {
+  const { data, error } = await supabaseClient
+    .from("profiles")
+    .select("*")
+    .eq("id", uid)
+    .maybeSingle();  // returns null instead of error when no row found
+
+  if (error) {
+    console.error("getProfile error:", error.message);
+    return null;
   }
-  return null;
+
+  // If no profile row exists yet, create one from the auth user metadata
+  if (!data) {
+    const { data: { user } } = await supabaseClient.auth.getUser();
+    const fallback = {
+      id: uid,
+      username: user?.user_metadata?.username || user?.email?.split("@")[0] || "",
+      email: user?.email || "",
+      bio: "",
+      avatarURL: "",
+      bannerURL: ""
+    };
+    const { error: insertError } = await supabaseClient
+      .from("profiles")
+      .upsert(fallback, { onConflict: "id" });
+
+    if (insertError) console.error("Profile create error:", insertError.message);
+    return fallback;
+  }
+
+  return data;
 }
 
-// ── Initial load ──────────────────────────────────────────────
-async function initPage() {
-  const { data: { session } } = await supabaseClient.auth.getSession();
-  if (!session?.user) {
-    window.location.href = "login.html";
-    return;
-  }
-  _setCurrentUser(session.user);
-  updateNavbar(session.user);
-  await loadProfile();
+// ── Update Profile Fields ─────────────────────────────────────
+// Uses upsert so if the profile row doesn't exist it gets created.
+async function updateProfile(uid, { username, bio, avatarURL, bannerURL }) {
+  const updates = { id: uid };
+  if (username !== undefined) updates.username = username;
+  if (bio !== undefined) updates.bio = bio;
+  if (avatarURL !== undefined) updates.avatarURL = avatarURL;
+  if (bannerURL !== undefined) updates.bannerURL = bannerURL;
+
+  const { error } = await supabaseClient
+    .from("profiles")
+    .upsert(updates, { onConflict: "id" });
+
+  return error ? error.message : null;
 }
 
-initPage();
+// ── Upload Avatar ─────────────────────────────────────────────
+async function uploadAvatar(uid, file) {
+  const ext = file.name.split(".").pop().toLowerCase();
+  const path = `${uid}/avatar_${Date.now()}.${ext}`;
 
-// ── Load everything ───────────────────────────────────────────
-// Stats and favorites load independently — a profile fetch
-// failure won't prevent them from rendering.
-async function loadProfile() {
-  const user = await getAuthUser();
-  if (!user) return;
+  const { error: uploadError } = await supabaseClient
+    .storage
+    .from(AVATAR_BUCKET)
+    .upload(path, file, {
+      upsert: true,
+      contentType: file.type
+    });
 
-  // Load profile info
-  try {
-    currentProfile = await getProfile(user.uid);
-    if (currentProfile) {
-      renderBanner(currentProfile);
-      renderAvatar(currentProfile);
-      renderUserInfo(currentProfile);
-    }
-  } catch (err) {
-    console.error("Error loading profile:", err);
-  }
+  if (uploadError) return { error: uploadError.message };
 
-  // Load stats independently
-  try {
-    const stats = await getProfileStats(user.uid);
-    renderStats(stats);
-  } catch (err) {
-    console.error("Error loading stats:", err);
-  }
+  const { data: urlData } = supabaseClient
+    .storage
+    .from(AVATAR_BUCKET)
+    .getPublicUrl(path);
 
-  // Load favorites independently
-  try {
-    const favGames = await getFavoriteGames(user.uid);
-    renderFavorites(favGames);
-  } catch (err) {
-    console.error("Error loading favorites:", err);
-  }
+  const avatarURL = urlData.publicUrl;
+  const saveError = await updateProfile(uid, { avatarURL });
+  return saveError ? { error: saveError } : { avatarURL, error: null };
 }
 
-// ── Render Banner ─────────────────────────────────────────────
-function renderBanner(profile) {
-  const bannerEl = document.getElementById("profile-banner");
-  if (profile.bannerURL) {
-    bannerEl.style.backgroundImage = `url(${profile.bannerURL})`;
-    bannerEl.classList.add("has-image");
-  } else {
-    bannerEl.style.backgroundImage = "";
-    bannerEl.classList.remove("has-image");
-  }
+// ── Upload Banner ─────────────────────────────────────────────
+async function uploadBanner(uid, file) {
+  const ext = file.name.split(".").pop().toLowerCase();
+  const path = `${uid}/banner_${Date.now()}.${ext}`;
+
+  const { error: uploadError } = await supabaseClient
+    .storage
+    .from(AVATAR_BUCKET)
+    .upload(path, file, {
+      upsert: true,
+      contentType: file.type
+    });
+
+  if (uploadError) return { error: uploadError.message };
+
+  const { data: urlData } = supabaseClient
+    .storage
+    .from(AVATAR_BUCKET)
+    .getPublicUrl(path);
+
+  const bannerURL = urlData.publicUrl;
+  const saveError = await updateProfile(uid, { bannerURL });
+  return saveError ? { error: saveError } : { bannerURL, error: null };
 }
 
-// ── Render Avatar ─────────────────────────────────────────────
-function renderAvatar(profile) {
-  const avatarEl = document.getElementById("profile-avatar");
-  if (profile.avatarURL) {
-    avatarEl.innerHTML = `<img src="${profile.avatarURL}" alt="avatar" class="avatar-img" />`;
-  } else {
-    const initials = (profile.username || "?").charAt(0).toUpperCase();
-    avatarEl.innerHTML = `<span class="avatar-initials">${initials}</span>`;
-  }
+// ── Get Profile Stats ─────────────────────────────────────────
+// Queries the games table to compute counts for the stats bar.
+async function getProfileStats(uid) {
+  const { data, error } = await supabaseClient
+    .from("games")
+    .select("status, favorite")
+    .eq("userId", uid);
+
+  if (error || !data) return { total: 0, played: 0, playing: 0, plan: 0, favorites: 0 };
+
+  return {
+    total: data.length,
+    played: data.filter(g => g.status === "played").length,
+    playing: data.filter(g => g.status === "playing").length,
+    plan: data.filter(g => g.status === "plan-to-play").length,
+    favorites: data.filter(g => g.favorite === true).length
+  };
 }
 
-// ── Render Username + Bio ─────────────────────────────────────
-function renderUserInfo(profile) {
-  document.getElementById("profile-username").textContent = profile.username || "No username";
-  document.getElementById("profile-bio").textContent = profile.bio || "No bio yet — add one!";
-}
+// ── Get Favorite Games ────────────────────────────────────────
+async function getFavoriteGames(uid) {
+  const { data, error } = await supabaseClient
+    .from("games")
+    .select("id, title, coverURL, genre, status, rating")
+    .eq("userId", uid)
+    .eq("favorite", true)
+    .order("createdAt", { ascending: false });
 
-// ── Render Stats ──────────────────────────────────────────────
-function renderStats(stats) {
-  document.getElementById("pstat-total").textContent = stats.total;
-  document.getElementById("pstat-played").textContent = stats.played;
-  document.getElementById("pstat-playing").textContent = stats.playing;
-  document.getElementById("pstat-plan").textContent = stats.plan;
-  document.getElementById("pstat-favorites").textContent = stats.favorites;
-}
-
-// ── Render Favorites Grid ─────────────────────────────────────
-function renderFavorites(games) {
-  const grid = document.getElementById("favorites-grid");
-  const empty = document.getElementById("favorites-empty");
-  grid.innerHTML = "";
-
-  if (!games || games.length === 0) {
-    empty.style.display = "block";
-    return;
-  }
-  empty.style.display = "none";
-
-  games.forEach(game => {
-    const card = document.createElement("a");
-    card.classList.add("fav-card");
-    card.href = `game-detail.html?id=${game.id}`;
-
-    const statusClass = {
-      "played": "badge-played",
-      "playing": "badge-playing",
-      "plan-to-play": "badge-plan"
-    }[game.status] || "badge-plan";
-
-    const statusLabel = {
-      "played": "Played",
-      "playing": "Playing",
-      "plan-to-play": "Plan to Play"
-    }[game.status] || "";
-
-    card.innerHTML = `
-      ${game.coverURL
-        ? `<img src="${game.coverURL}" class="fav-cover" alt="${game.title}" />`
-        : `<div class="fav-cover-placeholder">🎮</div>`}
-      <div class="fav-info">
-        <p class="fav-title">${game.title}</p>
-        <span class="card-badge ${statusClass} fav-badge">${statusLabel}</span>
-      </div>
-    `;
-
-    grid.appendChild(card);
-  });
-}
-
-// ── Logout button ─────────────────────────────────────────────
-document.getElementById("profile-logout-btn").onclick = () => logOut();
-
-// ── Edit Profile Toggle ───────────────────────────────────────
-const editBtn = document.getElementById("edit-profile-btn");
-const editForm = document.getElementById("edit-profile-form");
-const cancelBtn = document.getElementById("edit-cancel-btn");
-
-editBtn.addEventListener("click", () => {
-  document.getElementById("edit-username").value = currentProfile?.username || "";
-  document.getElementById("edit-bio").value = currentProfile?.bio || "";
-  editForm.style.display = "block";
-  editBtn.style.display = "none";
-});
-
-cancelBtn.addEventListener("click", () => {
-  editForm.style.display = "none";
-  editBtn.style.display = "inline-flex";
-});
-
-// ── Save Profile ──────────────────────────────────────────────
-document.getElementById("edit-profile-save").addEventListener("click", async () => {
-  const user = await getAuthUser();
-  if (!user) { showProfileToast("Session expired. Please log in again.", "error"); return; }
-
-  const username = document.getElementById("edit-username").value.trim();
-  const bio = document.getElementById("edit-bio").value.trim();
-
-  if (!username) { showProfileToast("Username can't be empty.", "error"); return; }
-
-  try {
-    const error = await updateProfile(user.uid, { username, bio });
-    if (error) {
-      showProfileToast("Error saving: " + error, "error");
-    } else {
-      showProfileToast("Profile updated! ✨", "success");
-      editForm.style.display = "none";
-      editBtn.style.display = "inline-flex";
-      await loadProfile();
-    }
-  } catch (err) {
-    showProfileToast("Error saving: " + err.message, "error");
-  }
-});
-
-// ── Avatar Upload ─────────────────────────────────────────────
-document.getElementById("avatar-upload-input").addEventListener("change", async (e) => {
-  const file = e.target.files[0];
-  if (!file) return;
-
-  const user = await getAuthUser();
-  if (!user) { showProfileToast("Session expired.", "error"); return; }
-
-  showProfileToast("Uploading avatar...", "info");
-  try {
-    const result = await uploadAvatar(user.uid, file);
-    if (result.error) {
-      showProfileToast("Upload failed: " + result.error, "error");
-    } else {
-      showProfileToast("Avatar updated! 🌸", "success");
-      await loadProfile();
-    }
-  } catch (err) {
-    showProfileToast("Upload failed: " + err.message, "error");
-  }
-  e.target.value = "";
-});
-
-// ── Banner Upload ─────────────────────────────────────────────
-document.getElementById("banner-upload-input").addEventListener("change", async (e) => {
-  const file = e.target.files[0];
-  if (!file) return;
-
-  const user = await getAuthUser();
-  if (!user) { showProfileToast("Session expired.", "error"); return; }
-
-  showProfileToast("Uploading banner...", "info");
-  try {
-    const result = await uploadBanner(user.uid, file);
-    if (result.error) {
-      showProfileToast("Upload failed: " + result.error, "error");
-    } else {
-      showProfileToast("Banner updated! 🎨", "success");
-      await loadProfile();
-    }
-  } catch (err) {
-    showProfileToast("Upload failed: " + err.message, "error");
-  }
-  e.target.value = "";
-});
-
-// ── Toast ──────────────────────────────────────────────────────
-function showProfileToast(message, type = "info") {
-  const toast = document.getElementById("toast");
-  if (!toast) return;
-  toast.textContent = message;
-  toast.className = `toast toast-${type} show`;
-  setTimeout(() => toast.classList.remove("show"), 4000);
+  if (error) return [];
+  return data;
 }

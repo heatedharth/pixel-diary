@@ -4,12 +4,16 @@
 //             profile.js, games.js
 // ============================================================
 
+// ── State ─────────────────────────────────────────────────────
 let currentProfile = null;
 
-// ── Get user safely ───────────────────────────────────────────
+// ── Get user safely (waits for session if not cached yet) ────
 async function getAuthUser() {
   let user = getCurrentUser();
   if (user) return user;
+
+  // getCurrentUser() can be null if onAuthStateChange hasn't
+  // fired yet — get the session directly as a fallback
   const { data: { session } } = await supabaseClient.auth.getSession();
   if (session?.user) {
     _setCurrentUser(session.user);
@@ -21,10 +25,12 @@ async function getAuthUser() {
 // ── Initial load ──────────────────────────────────────────────
 async function initPage() {
   const { data: { session } } = await supabaseClient.auth.getSession();
+
   if (!session?.user) {
     window.location.href = "login.html";
     return;
   }
+
   _setCurrentUser(session.user);
   updateNavbar(session.user);
   await loadProfile();
@@ -33,39 +39,22 @@ async function initPage() {
 initPage();
 
 // ── Load everything ───────────────────────────────────────────
-// Stats and favorites load independently — a profile fetch
-// failure won't prevent them from rendering.
 async function loadProfile() {
   const user = await getAuthUser();
   if (!user) return;
 
-  // Load profile info
-  try {
-    currentProfile = await getProfile(user.uid);
-    if (currentProfile) {
-      renderBanner(currentProfile);
-      renderAvatar(currentProfile);
-      renderUserInfo(currentProfile);
-    }
-  } catch (err) {
-    console.error("Error loading profile:", err);
-  }
+  currentProfile = await getProfile(user.uid);
+  if (!currentProfile) return;
 
-  // Load stats independently
-  try {
-    const stats = await getProfileStats(user.uid);
-    renderStats(stats);
-  } catch (err) {
-    console.error("Error loading stats:", err);
-  }
+  renderBanner(currentProfile);
+  renderAvatar(currentProfile);
+  renderUserInfo(currentProfile);
 
-  // Load favorites independently
-  try {
-    const favGames = await getFavoriteGames(user.uid);
-    renderFavorites(favGames);
-  } catch (err) {
-    console.error("Error loading favorites:", err);
-  }
+  const stats = await getProfileStats(user.uid);
+  renderStats(stats);
+
+  const favGames = await getFavoriteGames(user.uid);
+  renderFavorites(favGames);
 }
 
 // ── Render Banner ─────────────────────────────────────────────
@@ -113,7 +102,7 @@ function renderFavorites(games) {
   const empty = document.getElementById("favorites-empty");
   grid.innerHTML = "";
 
-  if (!games || games.length === 0) {
+  if (games.length === 0) {
     empty.style.display = "block";
     return;
   }
@@ -125,15 +114,11 @@ function renderFavorites(games) {
     card.href = `game-detail.html?id=${game.id}`;
 
     const statusClass = {
-      "played": "badge-played",
-      "playing": "badge-playing",
-      "plan-to-play": "badge-plan"
+      "played": "badge-played", "playing": "badge-playing", "plan-to-play": "badge-plan"
     }[game.status] || "badge-plan";
 
     const statusLabel = {
-      "played": "Played",
-      "playing": "Playing",
-      "plan-to-play": "Plan to Play"
+      "played": "Played", "playing": "Playing", "plan-to-play": "Plan to Play"
     }[game.status] || "";
 
     card.innerHTML = `
@@ -151,7 +136,7 @@ function renderFavorites(games) {
 }
 
 // ── Logout button ─────────────────────────────────────────────
-document.getElementById("profile-logout-btn").onclick = () => logOut();
+document.getElementById("profile-logout-btn").addEventListener("click", () => logOut());
 
 // ── Edit Profile Toggle ───────────────────────────────────────
 const editBtn = document.getElementById("edit-profile-btn");
@@ -173,25 +158,27 @@ cancelBtn.addEventListener("click", () => {
 // ── Save Profile ──────────────────────────────────────────────
 document.getElementById("edit-profile-save").addEventListener("click", async () => {
   const user = await getAuthUser();
-  if (!user) { showProfileToast("Session expired. Please log in again.", "error"); return; }
+  if (!user) {
+    showProfileToast("Session expired. Please log in again.", "error");
+    return;
+  }
 
   const username = document.getElementById("edit-username").value.trim();
   const bio = document.getElementById("edit-bio").value.trim();
 
-  if (!username) { showProfileToast("Username can't be empty.", "error"); return; }
+  if (!username) {
+    showProfileToast("Username can't be empty.", "error");
+    return;
+  }
 
-  try {
-    const error = await updateProfile(user.uid, { username, bio });
-    if (error) {
-      showProfileToast("Error saving: " + error, "error");
-    } else {
-      showProfileToast("Profile updated! ✨", "success");
-      editForm.style.display = "none";
-      editBtn.style.display = "inline-flex";
-      await loadProfile();
-    }
-  } catch (err) {
-    showProfileToast("Error saving: " + err.message, "error");
+  const error = await updateProfile(user.uid, { username, bio });
+  if (error) {
+    showProfileToast("Error saving profile: " + error, "error");
+  } else {
+    showProfileToast("Profile updated! ✨", "success");
+    editForm.style.display = "none";
+    editBtn.style.display = "inline-flex";
+    await loadProfile();
   }
 });
 
@@ -201,19 +188,18 @@ document.getElementById("avatar-upload-input").addEventListener("change", async 
   if (!file) return;
 
   const user = await getAuthUser();
-  if (!user) { showProfileToast("Session expired.", "error"); return; }
+  if (!user) {
+    showProfileToast("Session expired. Please log in again.", "error");
+    return;
+  }
 
   showProfileToast("Uploading avatar...", "info");
-  try {
-    const result = await uploadAvatar(user.uid, file);
-    if (result.error) {
-      showProfileToast("Upload failed: " + result.error, "error");
-    } else {
-      showProfileToast("Avatar updated! 🌸", "success");
-      await loadProfile();
-    }
-  } catch (err) {
-    showProfileToast("Upload failed: " + err.message, "error");
+  const result = await uploadAvatar(user.uid, file);
+  if (result.error) {
+    showProfileToast("Error uploading avatar: " + result.error, "error");
+  } else {
+    showProfileToast("Avatar updated! 🌸", "success");
+    await loadProfile();
   }
   e.target.value = "";
 });
@@ -224,19 +210,18 @@ document.getElementById("banner-upload-input").addEventListener("change", async 
   if (!file) return;
 
   const user = await getAuthUser();
-  if (!user) { showProfileToast("Session expired.", "error"); return; }
+  if (!user) {
+    showProfileToast("Session expired. Please log in again.", "error");
+    return;
+  }
 
   showProfileToast("Uploading banner...", "info");
-  try {
-    const result = await uploadBanner(user.uid, file);
-    if (result.error) {
-      showProfileToast("Upload failed: " + result.error, "error");
-    } else {
-      showProfileToast("Banner updated! 🎨", "success");
-      await loadProfile();
-    }
-  } catch (err) {
-    showProfileToast("Upload failed: " + err.message, "error");
+  const result = await uploadBanner(user.uid, file);
+  if (result.error) {
+    showProfileToast("Error uploading banner: " + result.error, "error");
+  } else {
+    showProfileToast("Banner updated! 🎨", "success");
+    await loadProfile();
   }
   e.target.value = "";
 });
@@ -247,5 +232,5 @@ function showProfileToast(message, type = "info") {
   if (!toast) return;
   toast.textContent = message;
   toast.className = `toast toast-${type} show`;
-  setTimeout(() => toast.classList.remove("show"), 4000);
+  setTimeout(() => toast.classList.remove("show"), 3000);
 }
