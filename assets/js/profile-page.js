@@ -43,18 +43,30 @@ async function loadProfile() {
   const user = await getAuthUser();
   if (!user) return;
 
-  currentProfile = await getProfile(user.uid);
-  if (!currentProfile) return;
+  try {
+    currentProfile = await getProfile(user.uid);
+    if (currentProfile) {
+      renderBanner(currentProfile);
+      renderAvatar(currentProfile);
+      renderUserInfo(currentProfile);
+    }
+  } catch (err) {
+    console.error("Profile render error:", err);
+  }
 
-  renderBanner(currentProfile);
-  renderAvatar(currentProfile);
-  renderUserInfo(currentProfile);
+  try {
+    const stats = await getProfileStats(user.uid);
+    renderStats(stats);
+  } catch (err) {
+    console.error("Stats error:", err);
+  }
 
-  const stats = await getProfileStats(user.uid);
-  renderStats(stats);
-
-  const favGames = await getFavoriteGames(user.uid);
-  renderFavorites(favGames);
+  try {
+    const favGames = await getFavoriteGames(user.uid);
+    renderFavorites(favGames);
+  } catch (err) {
+    console.error("Favorites error:", err);
+  }
 }
 
 // ── Render Banner ─────────────────────────────────────────────
@@ -84,7 +96,6 @@ function renderAvatar(profile) {
 function renderUserInfo(profile) {
   document.getElementById("profile-username").textContent = profile.username || "No username";
   document.getElementById("profile-bio").textContent = profile.bio || "No bio yet — add one!";
-  document.getElementById("profile-email").textContent = profile.email || "";
 }
 
 // ── Render Stats ──────────────────────────────────────────────
