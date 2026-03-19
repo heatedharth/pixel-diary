@@ -83,7 +83,16 @@
   z-index: 2;
 }
 
-/* ── Avatar ── */
+/* Push identity text down so it starts below the banner,
+   not overlapping it. The avatar (110px) minus the overlap
+   (52px) = 58px of avatar below the banner. Add padding
+   to push text content to start after that point. */
+.profile-identity {
+  flex: 1;
+  padding-top: 60px;
+  padding-bottom: 0.5rem;
+}
+
 .profile-avatar-wrap {
   position: relative;
   flex-shrink: 0;
@@ -147,10 +156,6 @@
 }
 
 /* ── Identity ── */
-.profile-identity {
-  flex: 1;
-  padding-bottom: 0.5rem;
-}
 
 .profile-username {
   font-family: var(--font-display);
@@ -488,6 +493,10 @@
     align-items: center;
     text-align: center;
     margin-top: -56px;
+  }
+
+  .profile-identity {
+    padding-top: 1rem;
   }
 
   .profile-actions {
