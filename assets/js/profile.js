@@ -15,18 +15,39 @@ async function getProfile(uid) {
     .from("profiles")
     .select("*")
     .eq("id", uid)
-    .single();
+    .maybeSingle();  // returns null instead of error when no row found
 
   if (error) {
     console.error("getProfile error:", error.message);
     return null;
   }
+
+  // If no profile row exists yet, create one from the auth user metadata
+  if (!data) {
+    const { data: { user } } = await supabaseClient.auth.getUser();
+    const fallback = {
+      id: uid,
+      username: user?.user_metadata?.username || user?.email?.split("@")[0] || "",
+      email: user?.email || "",
+      bio: "",
+      avatarURL: "",
+      bannerURL: ""
+    };
+    const { error: insertError } = await supabaseClient
+      .from("profiles")
+      .upsert(fallback, { onConflict: "id" });
+
+    if (insertError) console.error("Profile create error:", insertError.message);
+    return fallback;
+  }
+
   return data;
 }
 
 // ── Update Profile Fields ─────────────────────────────────────
+// Uses upsert so if the profile row doesn't exist it gets created.
 async function updateProfile(uid, { username, bio, avatarURL, bannerURL }) {
-  const updates = {};
+  const updates = { id: uid };
   if (username !== undefined) updates.username = username;
   if (bio !== undefined) updates.bio = bio;
   if (avatarURL !== undefined) updates.avatarURL = avatarURL;
@@ -34,8 +55,7 @@ async function updateProfile(uid, { username, bio, avatarURL, bannerURL }) {
 
   const { error } = await supabaseClient
     .from("profiles")
-    .update(updates)
-    .eq("id", uid);
+    .upsert(updates, { onConflict: "id" });
 
   return error ? error.message : null;
 }
