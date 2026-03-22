@@ -134,6 +134,10 @@ The development approach is **a couple core features per day**, fully working be
 
 All FireBase mentions are replaced with Supabase.
 
+### WHAT I LEARNED
+
+AI is really useful for getting a jumpstart on what I want to build; however, it needs coaching, and I can't just feed it all the info I want at the same time. To build efficiently, I have to take on features one by one, so it doesn't get confused and make a bunch of bugs within the code. Once all the features were built, I found it easier to manually find bugs myself than ask the AI to do it; some things are best left to humans. However, it is extremely excellent at fixing said bugs and finding bugs within the code.
+
 ---
 
 *Built with 💖 for gamers, by a gamer.*
