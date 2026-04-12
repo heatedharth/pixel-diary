@@ -11,6 +11,3 @@ assets/images/uploads/
 # Node (if any build tools are added later)
 node_modules/
 .env
-
-# RAWG and YouTube API
-api.config.js
