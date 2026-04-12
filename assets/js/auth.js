@@ -11,22 +11,30 @@ async function signUp(username, email, password) {
     if (error) return error.message;
 
     const user = data.user;
+    if (!user) {
+      // Email confirmation flow can return null user in some configs
+      return null;
+    }
 
+    // Try to create profile, but don't fail signup UX if RLS blocks it.
     const { error: profileError } = await supabaseClient
       .from("profiles")
       .insert({
         id: user.id,
-        username: username,
-        email: email,
+        username,
+        email,
         bio: "",
         avatarURL: "",
         bannerURL: ""
       });
 
-    if (profileError) return profileError.message;
+    if (profileError) {
+      console.warn("Profile insert skipped:", profileError.message);
+      // do not return this error to UI
+    }
 
     window.location.href = "library.html";
-
+    return null;
   } catch (err) {
     return err.message;
   }
