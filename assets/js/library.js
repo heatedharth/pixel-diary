@@ -1,11 +1,7 @@
 // ============================================================
 // library.js — Game Library Page Logic
-// Loads games, wires up the add/edit modal, delete confirm,
-// and search/filter controls.
-// Depends on: db.js, auth.js, games.js, ui.js, search-filter.js
 // ============================================================
 
-// ── Get user safely (fallback if cache not yet populated) ────
 async function getAuthUser() {
     let user = getCurrentUser();
     if (user) return user;
@@ -17,10 +13,9 @@ async function getAuthUser() {
     return null;
 }
 
-// ── Master games array (never re-fetched just to filter) ─────
 let allGames = [];
+let rawgDebounceTimer = null;
 
-// ── Load & Render Library ────────────────────────────────────
 async function loadLibrary() {
     const user = await getAuthUser();
     if (!user) return;
@@ -39,7 +34,6 @@ async function loadLibrary() {
     }
 }
 
-// ── Render Stats Bar ─────────────────────────────────────────
 function renderStats(games) {
     const total = games.length;
     const playing = games.filter(g => g.status === "playing").length;
@@ -57,7 +51,6 @@ function renderStats(games) {
     if (countEl) countEl.textContent = total === 1 ? "1 game" : `${total} games`;
 }
 
-// ── Populate Genre Dropdown ───────────────────────────────────
 function populateGenreDropdown(games) {
     const select = document.getElementById("filter-genre");
     const current = select.value;
@@ -74,7 +67,6 @@ function populateGenreDropdown(games) {
     if (genres.includes(current)) select.value = current;
 }
 
-// ── Apply Filters + Sort ──────────────────────────────────────
 function applyFilters() {
     const query = document.getElementById("search-input").value;
     const genre = document.getElementById("filter-genre").value;
@@ -91,7 +83,6 @@ function applyFilters() {
     document.getElementById("search-clear").style.display = query.trim() !== "" ? "flex" : "none";
 }
 
-// ── Render Filtered Grid ──────────────────────────────────────
 function renderFilteredGrid(games) {
     const grid = document.getElementById("game-grid");
     const empty = document.getElementById("empty-state");
@@ -129,6 +120,7 @@ function renderFilteredGrid(games) {
         card.querySelector(".btn-edit").addEventListener("click", (e) => {
             e.stopPropagation();
             openModal("edit", game);
+            resetRawgSearchUI();
         });
 
         card.querySelector(".btn-delete").addEventListener("click", (e) => {
@@ -140,7 +132,71 @@ function renderFilteredGrid(games) {
     });
 }
 
-// ── Filter + Sort Event Listeners ────────────────────────────
+// ── RAWG helpers ──────────────────────────────────────────────
+function renderRawgResults(items) {
+    const resultsEl = document.getElementById("rawg-results");
+    if (!resultsEl) return;
+
+    resultsEl.innerHTML = "";
+    if (!items || items.length === 0) {
+        resultsEl.style.display = "none";
+        return;
+    }
+
+    items.forEach(item => {
+        const row = document.createElement("button");
+        row.type = "button";
+        row.className = "rawg-result-item";
+        const year = item.released ? ` (${item.released.slice(0, 4)})` : "";
+
+        row.innerHTML = `
+            <span class="rawg-result-title">${item.title}${year}</span>
+            <span class="rawg-result-meta">${item.genre || "Unknown genre"}</span>
+        `;
+
+        row.addEventListener("click", () => {
+            document.getElementById("field-title").value = item.title || "";
+            document.getElementById("field-cover").value = item.coverURL || "";
+            document.getElementById("field-genre").value = item.genre || "";
+            document.getElementById("field-platform").value = item.platform || "";
+            document.getElementById("rawg-search").value = item.title || "";
+            resultsEl.style.display = "none";
+            showToast("Game details auto-filled from RAWG ✨", "success");
+        });
+
+        resultsEl.appendChild(row);
+    });
+
+    resultsEl.style.display = "block";
+}
+
+async function handleRawgSearchInput() {
+    const searchEl = document.getElementById("rawg-search");
+    if (!searchEl) return;
+    const query = searchEl.value.trim();
+
+    if (rawgDebounceTimer) clearTimeout(rawgDebounceTimer);
+    rawgDebounceTimer = setTimeout(async () => {
+        if (query.length < 2) {
+            renderRawgResults([]);
+            return;
+        }
+        const items = await rawgSearchGames(query);
+        renderRawgResults(items);
+    }, 300);
+}
+
+function resetRawgSearchUI() {
+    const searchEl = document.getElementById("rawg-search");
+    const resultsEl = document.getElementById("rawg-results");
+    if (searchEl) searchEl.value = "";
+    if (resultsEl) {
+        resultsEl.innerHTML = "";
+        resultsEl.style.display = "none";
+    }
+}
+
+// ── Filter/sort listeners ─────────────────────────────────────
 document.getElementById("search-input").addEventListener("input", applyFilters);
 document.getElementById("filter-genre").addEventListener("change", applyFilters);
 document.getElementById("filter-status").addEventListener("change", applyFilters);
@@ -160,7 +216,21 @@ document.getElementById("filter-clear-btn").addEventListener("click", () => {
     applyFilters();
 });
 
-// ── Game Form Submit (Add or Edit) ───────────────────────────
+// ── RAWG listeners ────────────────────────────────────────────
+const rawgInput = document.getElementById("rawg-search");
+if (rawgInput) {
+    rawgInput.addEventListener("input", handleRawgSearchInput);
+}
+
+document.addEventListener("click", (e) => {
+    const wrap = document.getElementById("rawg-results");
+    const input = document.getElementById("rawg-search");
+    if (!wrap || !input) return;
+    if (e.target === input || wrap.contains(e.target)) return;
+    wrap.style.display = "none";
+});
+
+// ── Form submit ───────────────────────────────────────────────
 document.getElementById("game-form").addEventListener("submit", async (e) => {
     e.preventDefault();
 
@@ -195,31 +265,44 @@ document.getElementById("game-form").addEventListener("submit", async (e) => {
         } else {
             showToast("Game updated! ✨", "success");
             closeModal();
+            resetRawgSearchUI();
             loadLibrary();
         }
     } else {
-        const { id, error } = await addGame(user.uid, gameData);
+        const { error } = await addGame(user.uid, gameData);
         if (error) {
             showToast("Error adding game: " + error, "error");
         } else {
             showToast("Game added! 🎮", "success");
             closeModal();
+            resetRawgSearchUI();
             loadLibrary();
         }
     }
 });
 
-// ── Modal close buttons ──────────────────────────────────────
-document.getElementById("modal-close-btn").addEventListener("click", closeModal);
-document.getElementById("modal-cancel-btn").addEventListener("click", closeModal);
+// ── Modal controls ────────────────────────────────────────────
+document.getElementById("modal-close-btn").addEventListener("click", () => {
+    closeModal();
+    resetRawgSearchUI();
+});
+document.getElementById("modal-cancel-btn").addEventListener("click", () => {
+    closeModal();
+    resetRawgSearchUI();
+});
 document.getElementById("game-modal").addEventListener("click", (e) => {
-    if (e.target === e.currentTarget) closeModal();
+    if (e.target === e.currentTarget) {
+        closeModal();
+        resetRawgSearchUI();
+    }
 });
 
-// ── Add Game button ──────────────────────────────────────────
-document.getElementById("add-game-btn").addEventListener("click", () => openModal("add"));
+document.getElementById("add-game-btn").addEventListener("click", () => {
+    openModal("add");
+    resetRawgSearchUI();
+});
 
-// ── Delete Confirm ───────────────────────────────────────────
+// ── Delete confirm ────────────────────────────────────────────
 document.getElementById("confirm-delete-btn").addEventListener("click", async (e) => {
     const user = await getAuthUser();
     if (!user) return;
@@ -240,9 +323,7 @@ document.getElementById("delete-modal").addEventListener("click", (e) => {
     if (e.target === e.currentTarget) closeDeleteModal();
 });
 
-// ── Initial load ─────────────────────────────────────────────
-// Use getSession() directly instead of onAuthStateChange —
-// much more reliable for initial page load.
+// ── Init ──────────────────────────────────────────────────────
 async function initPage() {
     const { data: { session } } = await supabaseClient.auth.getSession();
 
@@ -255,12 +336,14 @@ async function initPage() {
     updateNavbar(session.user);
     await loadLibrary();
 
-    // Auto-open edit modal if redirected from game-detail page
     const params = new URLSearchParams(window.location.search);
     const editId = params.get("edit");
     if (editId) {
         const game = allGames.find(g => g.id === editId);
-        if (game) openModal("edit", game);
+        if (game) {
+            openModal("edit", game);
+            resetRawgSearchUI();
+        }
         window.history.replaceState({}, "", window.location.pathname);
     }
 }

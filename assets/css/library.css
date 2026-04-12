@@ -818,6 +818,49 @@
     background: linear-gradient(135deg, var(--purple), var(--purple-deep));
 }
 
+/* ── RAWG search results ────────────────────────────────────── */
+.rawg-results {
+    margin-top: 0.5rem;
+    border: 1.5px solid var(--purple-light);
+    border-radius: 12px;
+    background: white;
+    max-height: 220px;
+    overflow-y: auto;
+    display: none;
+}
+
+.rawg-result-item {
+    width: 100%;
+    border: none;
+    background: white;
+    text-align: left;
+    padding: 0.65rem 0.8rem;
+    cursor: pointer;
+    border-bottom: 1px solid var(--surface);
+    display: flex;
+    flex-direction: column;
+    gap: 0.1rem;
+}
+
+.rawg-result-item:last-child {
+    border-bottom: none;
+}
+
+.rawg-result-item:hover {
+    background: var(--surface);
+}
+
+.rawg-result-title {
+    font-family: var(--font-display);
+    color: var(--text-dark);
+    font-size: 1rem;
+}
+
+.rawg-result-meta {
+    color: var(--text-soft);
+    font-size: 0.95rem;
+}
+
 /* ── Responsive ── */
 @media (max-width: 768px) {
     .library-header {

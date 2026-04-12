@@ -15,7 +15,6 @@
 
 <body class="library-page">
 
-    <!-- ==================== NAVBAR ==================== -->
     <header>
         <nav>
             <div class="nav-logo">
@@ -35,7 +34,6 @@
         </nav>
     </header>
 
-    <!-- ==================== LIBRARY HEADER ==================== -->
     <div class="library-header">
         <div class="library-title-group">
             <h1>My Library</h1>
@@ -44,7 +42,6 @@
         <button class="add-game-btn" id="add-game-btn">+ Add Game</button>
     </div>
 
-    <!-- ==================== STATS BAR ==================== -->
     <div class="stats-bar" id="stats-bar">
         <div class="stat-card">
             <span class="stat-number" id="stat-total">0</span>
@@ -68,7 +65,6 @@
         </div>
     </div>
 
-    <!-- ==================== FILTER BAR ==================== -->
     <div class="filter-bar" id="filter-bar">
         <div class="filter-search-wrap">
             <span class="filter-search-icon">🔍</span>
@@ -96,7 +92,6 @@
         <button class="filter-clear-btn" id="filter-clear-btn">Clear Filters</button>
     </div>
 
-    <!-- ==================== GAME GRID ==================== -->
     <div class="game-grid-container">
         <div id="spinner">
             <div class="spinner-ring"></div>
@@ -108,7 +103,6 @@
         <div id="game-grid"></div>
     </div>
 
-    <!-- ==================== ADD / EDIT MODAL ==================== -->
     <div class="modal-backdrop" id="game-modal">
         <div class="modal-card">
             <div class="modal-header">
@@ -116,6 +110,14 @@
                 <button class="modal-close" id="modal-close-btn">✕</button>
             </div>
             <form class="modal-form" id="game-form">
+
+                <!-- NEW: RAWG search -->
+                <div class="form-group">
+                    <label for="rawg-search">Search game (RAWG)</label>
+                    <input type="text" id="rawg-search" placeholder="Type to search games..." autocomplete="off" />
+                    <div id="rawg-results" class="rawg-results"></div>
+                </div>
+
                 <div class="form-group">
                     <label for="field-title">Game Title *</label>
                     <input type="text" id="field-title" placeholder="e.g. Hollow Knight" required />
@@ -156,7 +158,6 @@
         </div>
     </div>
 
-    <!-- ==================== DELETE CONFIRM MODAL ==================== -->
     <div class="modal-backdrop" id="delete-modal">
         <div class="modal-card delete-modal-card">
             <span class="delete-icon">🗑️</span>
@@ -169,12 +170,11 @@
         </div>
     </div>
 
-    <!-- ==================== TOAST ==================== -->
     <div class="toast" id="toast"></div>
 
-    <!-- ==================== SCRIPTS ==================== -->
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <script src="../supabase.config.js"></script>
+    <script src="../api.config.js"></script>
     <script src="../assets/js/db.js"></script>
     <script src="../assets/js/auth.js"></script>
     <script src="../assets/js/app.js"></script>
@@ -183,6 +183,7 @@
     <script src="../assets/js/sort.js"></script>
     <script src="../assets/js/reviews.js"></script>
     <script src="../assets/js/ui.js"></script>
+    <script src="../assets/js/external-apis.js"></script>
     <script src="../assets/js/library.js"></script>
 
 </body>

@@ -803,6 +803,36 @@
   background: linear-gradient(135deg, var(--purple), var(--purple-deep));
 }
 
+/* ── Trailer ────────────────────────────────────────────────── */
+.trailer-loading,
+.trailer-empty {
+  color: var(--text-soft);
+  font-size: 1.1rem;
+}
+
+.trailer-embed-wrap {
+  position: relative;
+  width: 100%;
+  padding-top: 56.25%;
+  border-radius: 14px;
+  overflow: hidden;
+  border: 1.5px solid var(--purple-light);
+  background: #000;
+}
+
+.trailer-embed {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+}
+
+.trailer-caption {
+  margin-top: 0.6rem;
+  color: var(--text-soft);
+  font-size: 1rem;
+}
+
 /* ── Responsive ── */
 @media (max-width: 680px) {
   .detail-hero {
