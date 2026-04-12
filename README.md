@@ -8,10 +8,12 @@
 
 - [About the Project](#about-the-project)
 - [Tech Stack](#tech-stack)
+- [External API Features (Assignment)](#external-api-features-assignment)
+- [How to Run](#how-to-run)
 - [Features](#features)
 - [File Structure](#file-structure)
 - [Project Plan](#project-plan)
-- [Future Roadmap](#future-roadmap)
+- [What I Learned](#what-i-learned)
 
 ---
 
@@ -31,11 +33,82 @@ The aesthetic is cute, kawaii-inspired, and geared toward making game tracking f
 | **Styling** | CSS3 (custom properties, flexbox, grid) |
 | **Fonts** | Jersey 10 (header), Just Me Again Down Here (body) |
 | **Logic** | Vanilla JavaScript (ES6+) |
-| **Authentication** | Firebase Authentication |
-| **Database** | Firebase Firestore (cloud, NoSQL) |
-| **Media Storage** | Firebase Storage |
+| **Authentication** | Supabase Auth |
+| **Database** | Supabase Postgres |
+| **Media Storage** | Supabase Storage |
+| **External API #1** | RAWG Video Games Database API |
+| **External API #2** | YouTube Data API v3 |
 | **Hosting** | GitHub Pages |
 | **Version Control** | Git + GitHub |
+
+---
+
+## 🌐 External API Features (Assignment)
+
+This project integrates **2 external APIs**:
+
+### 1: RAWG Video Games Database API (Add Game Autofill)
+
+**What it does:**
+- In the Add/Edit Game modal on `library.html`, users can search real game titles from RAWG.
+- Selecting a result auto-fills:
+  - Game title
+  - Cover image URL
+  - Genre
+  - Platform(s)
+
+**Why it helps:**
+- Speeds up adding games
+- Reduces manual typing errors
+- Makes entries more consistent
+
+---
+
+### 2: YouTube Data API v3 (Auto Trailer on Game Detail)
+
+**What it does:**
+- On `game-detail.html`, the app automatically searches YouTube for:
+  - `"<game title> official trailer"`
+- It embeds a trailer video directly in the game detail page.
+
+**Why it helps:**
+- Adds richer context for each game
+- Makes game pages more interactive and media-rich
+
+---
+
+## ▶️ How to Run
+
+### 1: Clone the project
+```bash
+git clone https://github.com/heatedharth/pixel-diary.git
+cd pixel-diary
+```
+
+### 2: Configure Supabase
+Edit `supabase.config.js`:
+- `SUPABASE_URL`
+- `SUPABASE_ANON_KEY`
+
+### 3: Configure external API keys
+Add your keys in your config file (where your app currently reads them), for example:
+- `RAWG_API_KEY`
+- `YOUTUBE_API_KEY`
+
+### 4: Restrict your YouTube key (recommended)
+In Google Cloud Console:
+- Application restrictions: **Websites**
+- Allowed referrer(s): your GitHub Pages domain (example: `https://yourusername.github.io/*`)
+- API restrictions: **YouTube Data API v3 only**
+
+### 5: Run locally
+Use any local static server (example with VS Code Live Server), then open:
+- `index.html`
+
+### 6: Deploy to GitHub Pages
+Push to your Pages branch and verify:
+- RAWG search autofill works in Library modal
+- Trailer appears on Game Detail page
 
 ---
 
@@ -46,9 +119,6 @@ Users can add games to their personal library with details like title, genre, pl
 
 ### 🔍 Search and Filter
 A live search bar lets users find games by title instantly. Filter controls allow narrowing the library by genre, play status, or star rating.
-
-### 📊 Dynamic Content Display
-The game library renders dynamically from the database — no page reloads needed. Game cards update in real time when data changes.
 
 ### 🔀 Sorting
 Users can sort their library by:
@@ -62,58 +132,58 @@ Users can sort their library by:
 Each game entry supports a 1–5 star rating and a personal written review. Reviews can be added, edited, or deleted at any time.
 
 ### 📸 Media Uploads
-Users can upload screenshots and video clips directly to a game entry. Files are stored in Firebase Storage and displayed in a media gallery on the game detail page.
+Users can upload screenshots and video clips directly to a game entry. Files are stored in Supabase Storage and displayed in a media gallery on the game detail page.
 
 ### 🔐 Sign Up, Log In, and Log Out
-Full user authentication via Firebase Auth. Users create an account with email and password, log in securely, and log out from any page. Protected pages redirect unauthenticated users to the login screen.
+Full user authentication via Supabase Auth. Users create an account with email and password, log in securely, and log out from any page. Protected pages redirect unauthenticated users to the login screen.
 
 ### 👤 Customizable User Profile
 Each user has a profile page where they can set a username, bio, avatar image, and banner. A stats section shows total games, games played, and favorites count.
 
 ### ☁️ Cloud Database
-All game data, reviews, and profile information are stored in Firebase Firestore. Data is tied to each user's account and syncs across devices in real time.
+All game data, reviews, and profile information are stored in Supabase and tied to each user's account.
 
 ---
 
 ## 📁 File Structure
 
-```
+```text
 pixel-diary/
-├── index.html                  ← Landing page (hero, features, CTA)
-├── firebase.config.js          ← Firebase project credentials (gitignored)
-├── .gitignore
+├── index.html
+├── supabase.config.js
 ├── README.md
+├── .gitignore
 │
 ├── pages/
-│   ├── library.html            ← Main game dashboard (search, filter, grid)
-│   ├── game-detail.html        ← Individual game page (status, review, media)
-│   ├── login.html              ← Login form
-│   ├── signup.html             ← Sign up form
-│   └── profile.html            ← User profile page
+│   ├── library.html
+│   ├── game-detail.html
+│   ├── login.html
+│   ├── signup.html
+│   └── profile.html
 │
 ├── assets/
 │   ├── css/
-│   │   ├── main.css            ← Global styles, kawaii theme variables
-│   │   ├── auth.css            ← Login and signup page styles
-│   │   ├── library.css         ← Library grid and filter bar styles
-│   │   ├── game-detail.css     ← Game detail page styles
-│   │   └── profile.css         ← Profile page styles
+│   │   ├── main.css
+│   │   ├── auth.css
+│   │   ├── library.css
+│   │   ├── game-detail.css
+│   │   └── profile.css
 │   │
-│   ├── js/
-│   │   ├── app.js              ← App entry point, auth state listener
-│   │   ├── router.js           ← Client-side navigation and routing
-│   │   ├── db.js               ← Firebase/Firestore initialization and helpers
-│   │   ├── auth.js             ← Sign up, log in, log out, password reset
-│   │   ├── games.js            ← Game CRUD (create, read, update, delete)
-│   │   ├── search-filter.js    ← Search and filter logic
-│   │   ├── sort.js             ← Sorting functions
-│   │   ├── reviews.js          ← Ratings and review CRUD
-│   │   ├── media.js            ← File upload and retrieval (Firebase Storage)
-│   │   ├── profile.js          ← Profile read/update, avatar/banner upload
-│   │   └── ui.js               ← DOM rendering, modals, toasts, loading states
-│   │
-│   └── images/
-│       └── uploads/            ← Local image assets (gitignored, stored in Firebase)
+│   └── js/
+│       ├── app.js
+│       ├── db.js
+│       ├── auth.js
+│       ├── games.js
+│       ├── search-filter.js
+│       ├── sort.js
+│       ├── reviews.js
+│       ├── media.js
+│       ├── profile.js
+│       ├── profile-page.js
+│       ├── ui.js
+│       ├── library.js
+│       ├── game-detail.js
+│       └── external-apis.js
 ```
 
 ---
@@ -124,17 +194,16 @@ The development approach is **a couple core features per day**, fully working be
 
 | Day | Core Feature |
 |-----|-------------|
-| **Day 1** | Firebase setup + Authentication + Sign up, log in, log out working + Game CRUD + Add, edit, delete a game entry from Firestore |
-| **Day 2** | Game Library display + Dynamic card grid rendering from database + Search and Filter + Live search, genre filter, status filter |
-| **Day 3** | Sorting (A-Z, by rating, by most played, by date added) + Ratings and Reviews + Star rating widget, written review, edit/delete |
-| **Day 4** | Media Uploads + Image/clip upload to Firebase Storage, gallery display + User Profile + Profile page, avatar, bio, banner, stats |
-| **Day 5** | UI Polish + Kawaii styling, responsive layout, transitions + Testing + Bug Fixes + Cross-browser checks, edge case handling, final cleanup |
+| **Day 1** | Supabase setup + Authentication + Game CRUD |
+| **Day 2** | Game Library display + Search + Filter |
+| **Day 3** | Sorting + Ratings + Reviews |
+| **Day 4** | Media Uploads + User Profile |
+| **Day 5** | UI Polish + Testing + Bug Fixes |
+| **Day 6** | External API Integration (RAWG + YouTube) |
 
-### NOTES
+---
 
-All FireBase mentions are replaced with Supabase.
-
-### WHAT I LEARNED
+## 🧠 What I Learned
 
 AI is really useful for getting a jumpstart on what I want to build; however, it needs coaching, and I can't just feed it all the info I want at the same time. To build efficiently, I have to take on features one by one, so it doesn't get confused and make a bunch of bugs within the code. Once all the features were built, I found it easier to manually find bugs myself than ask the AI to do it; some things are best left to humans. However, it is extremely excellent at fixing said bugs and finding bugs within the code.
 
