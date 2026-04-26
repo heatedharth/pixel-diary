@@ -9,7 +9,10 @@
   align-items: center;
   justify-content: center;
   padding: 2rem;
-  overflow: hidden;
+  overflow-y: auto;
+  /* allow vertical scroll */
+  overflow-x: hidden;
+  /* prevent sideways jiggle */
 }
 
 /* ── Auth Card ── */
