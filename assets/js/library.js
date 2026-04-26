@@ -302,6 +302,16 @@ document.getElementById("add-game-btn").addEventListener("click", () => {
     resetRawgSearchUI();
 });
 
+document.getElementById("random-game-btn").addEventListener("click", () => {
+    if (!allGames.length) {
+        showToast("Add some games first!", "info");
+        return;
+    }
+    const i = Math.floor(Math.random() * allGames.length);
+    const game = allGames[i];
+    window.location.href = `game-detail.html?id=${game.id}`;
+});
+
 // ── Delete confirm ────────────────────────────────────────────
 document.getElementById("confirm-delete-btn").addEventListener("click", async (e) => {
     const user = await getAuthUser();
