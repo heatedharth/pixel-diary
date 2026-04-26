@@ -264,3 +264,8 @@
   border-color: #6fcf97;
   display: block;
 }
+
+.auth-page {
+  min-height: 100vh;
+  overflow: hidden;
+}
