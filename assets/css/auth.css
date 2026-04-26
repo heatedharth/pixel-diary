@@ -9,6 +9,7 @@
   align-items: center;
   justify-content: center;
   padding: 2rem;
+  overflow: hidden;
 }
 
 /* ── Auth Card ── */
@@ -263,13 +264,4 @@
   color: #2e7d52;
   border-color: #6fcf97;
   display: block;
-}
-
-.auth-page {
-  min-height: 100vh;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  padding: 2rem;
-  overflow: hidden;
 }
