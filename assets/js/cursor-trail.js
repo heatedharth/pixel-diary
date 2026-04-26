@@ -2,27 +2,34 @@
 // cursor-trail.js — Pixel sparkle trail
 // ============================================================
 
+// cursor-trail.js — mobile-safe sparkle trail
 let lastSparkleTime = 0;
-const SPARKLE_INTERVAL = 28; // increase to 40+ if you want fewer sparkles
+const SPARKLE_INTERVAL = 45; // fewer particles = less jitter
 
-document.addEventListener("mousemove", (e) => {
-  const now = Date.now();
-  if (now - lastSparkleTime < SPARKLE_INTERVAL) return;
-  lastSparkleTime = now;
+const prefersReduced = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+const isTouch = window.matchMedia("(pointer: coarse)").matches;
 
-  const s = document.createElement("span");
-  s.className = "cursor-sparkle";
+if (!prefersReduced && !isTouch) {
+  document.addEventListener("mousemove", (e) => {
+    const now = Date.now();
+    if (now - lastSparkleTime < SPARKLE_INTERVAL) return;
+    lastSparkleTime = now;
 
-  const ox = (Math.random() - 0.5) * 10;
-  const oy = (Math.random() - 0.5) * 10;
+    const s = document.createElement("span");
+    s.className = "cursor-sparkle";
 
-  s.style.left = `${e.clientX + ox}px`;
-  s.style.top = `${e.clientY + oy}px`;
+    const ox = (Math.random() - 0.5) * 8;
+    const oy = (Math.random() - 0.5) * 8;
 
-  const size = 6 + Math.random() * 5;
-  s.style.width = `${size}px`;
-  s.style.height = `${size}px`;
+    // absolute to document, not fixed to viewport
+    s.style.left = `${window.scrollX + e.clientX + ox}px`;
+    s.style.top = `${window.scrollY + e.clientY + oy}px`;
 
-  document.body.appendChild(s);
-  setTimeout(() => s.remove(), 560);
-});
+    const size = 5 + Math.random() * 4;
+    s.style.width = `${size}px`;
+    s.style.height = `${size}px`;
+
+    document.body.appendChild(s);
+    setTimeout(() => s.remove(), 450);
+  }, { passive: true });
+}

@@ -669,3 +669,48 @@ footer nav a:hover {
     grid-template-columns: 1fr;
   }
 }
+
+/* ── Custom Pixel Cursor ───────────────────────────────────── */
+html,
+body,
+a,
+button,
+input,
+textarea,
+select,
+label {
+  cursor: url("../images/cursor/pixel-cursor.png") 4 2, auto;
+}
+
+a:hover,
+button:hover,
+.card-btn:hover,
+.add-game-btn:hover {
+  cursor: url("../images/cursor/pixel-cursor-pointer.png") 6 2, pointer;
+}
+
+/* Sparkle particles */
+.cursor-sparkle {
+  position: absolute;
+  width: 8px;
+  height: 8px;
+  pointer-events: none;
+  z-index: 9999;
+  border-radius: 2px;
+  background: linear-gradient(135deg, #ffb5c6, #c7a8f0);
+  box-shadow: 0 0 10px rgba(255, 181, 198, 0.8);
+  animation: sparkle-fade 420ms ease-out forwards;
+  will-change: transform, opacity;
+}
+
+@keyframes sparkle-fade {
+  from {
+    opacity: 0.9;
+    transform: translate3d(0, 0, 0) scale(1);
+  }
+
+  to {
+    opacity: 0;
+    transform: translate3d(0, -8px, 0) scale(0.35);
+  }
+}
