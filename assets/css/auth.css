@@ -6,9 +6,11 @@
 .auth-page {
   min-height: 100vh;
   display: flex;
-  align-items: center;
   justify-content: center;
-  padding: 2rem;
+  align-items: flex-start;
+  padding: 2rem 1rem 3rem;
+  overflow-x: hidden;
+  overflow-y: auto;
 }
 
 /* ── Auth Card ── */
@@ -16,6 +18,7 @@
   background: white;
   border: 2px solid var(--pink-light);
   border-radius: 28px;
+  margin: 0 auto;
   padding: 3rem 2.5rem;
   width: 100%;
   max-width: 460px;
