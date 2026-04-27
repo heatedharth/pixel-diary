@@ -936,9 +936,7 @@
 select,
 button,
 .card-actions button,
-.favorite-btn,
-#change-avatar-btn,
-.change-avatar-btn {
+.favorite-btn {
     cursor: url("../images/cursor/pixel-cursor-pointer.png") 6 2, pointer;
 }
 
