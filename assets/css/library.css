@@ -912,3 +912,11 @@
         grid-template-columns: 1fr;
     }
 }
+
+.game-card .card-image,
+.game-card .favorite-btn,
+.game-card .card-actions button,
+.game-card a,
+.game-card button {
+    cursor: url("../images/cursor/pixel-cursor-pointer.png") 6 2, pointer;
+}
