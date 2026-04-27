@@ -529,3 +529,9 @@
 .banner-upload-btn * {
   cursor: url("../images/cursor/pixel-cursor-pointer.png") 6 2, pointer !important;
 }
+
+/* Profile stats cards = normal custom cursor */
+.profile-stats .pstat-card,
+.profile-stats .pstat-card * {
+  cursor: url("../images/cursor/pixel-cursor.png") 4 2, auto !important;
+}
