@@ -913,10 +913,37 @@
     }
 }
 
-.game-card .card-image,
-.game-card .favorite-btn,
-.game-card .card-actions button,
+/* ============================================================
+   Cursor overrides (library page)
+   ============================================================ */
+
+/* 1) Normal custom cursor for non-clickable cards */
+.stats-card,
+.game-card {
+    cursor: url("../images/cursor/pixel-cursor.png") 4 2, auto;
+}
+
+/* Keep normal cursor inside card text/content too */
+.stats-card *,
+.game-card * {
+    cursor: url("../images/cursor/pixel-cursor.png") 4 2, auto;
+}
+
+/* 2) Pointer cursor for interactive controls */
+#filter-genre,
+#filter-status,
+#sort-select,
+select,
+button,
+.card-actions button,
+.favorite-btn,
+#change-avatar-btn,
+.change-avatar-btn {
+    cursor: url("../images/cursor/pixel-cursor-pointer.png") 6 2, pointer;
+}
+
+/* Optional: clickable card image/title links should be pointer */
 .game-card a,
-.game-card button {
+.game-card .card-image {
     cursor: url("../images/cursor/pixel-cursor-pointer.png") 6 2, pointer;
 }
