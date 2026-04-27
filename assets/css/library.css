@@ -945,3 +945,9 @@ button,
 .game-card .card-image {
     cursor: url("../images/cursor/pixel-cursor-pointer.png") 6 2, pointer;
 }
+
+/* 3) Library stat bar */
+#stats-bar .stat-card,
+#stats-bar .stat-card * {
+    cursor: url("../images/cursor/pixel-cursor.png") 4 2, auto !important;
+}

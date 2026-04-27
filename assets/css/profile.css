@@ -516,7 +516,16 @@
   }
 }
 
-#avatar-upload-btn,
-.avatar-upload-btn {
-  cursor: url("../images/cursor/pixel-cursor-pointer.png") 6 2, pointer;
+/* ===== Cursor: Profile avatar + banner controls ===== */
+
+/* Change avatar button (✏️) = pointer cursor */
+.avatar-upload-btn,
+.avatar-upload-btn * {
+  cursor: url("../images/cursor/pixel-cursor-pointer.png") 6 2, pointer !important;
+}
+
+/* Change banner button (📷) = pointer cursor */
+.banner-upload-btn,
+.banner-upload-btn * {
+  cursor: url("../images/cursor/pixel-cursor-pointer.png") 6 2, pointer !important;
 }
