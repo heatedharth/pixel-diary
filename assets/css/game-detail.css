@@ -863,3 +863,14 @@
     grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
   }
 }
+
+/* ===== Custom cursor for trailer + media upload ===== */
+#trailer-container,
+#trailer-container * {
+  cursor: url("../images/cursor/pixel-cursor.png") 4 2, auto !important;
+}
+
+#media-upload-zone,
+#media-upload-zone * {
+  cursor: url("../images/cursor/pixel-cursor-pointer.png") 6 2, pointer !important;
+}
