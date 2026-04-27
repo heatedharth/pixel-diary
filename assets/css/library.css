@@ -918,7 +918,7 @@
    ============================================================ */
 
 /* 1) Normal custom cursor for non-clickable cards */
-.stats-card,
+.stat-card,
 .game-card {
     cursor: url("../images/cursor/pixel-cursor.png") 4 2, auto;
 }
